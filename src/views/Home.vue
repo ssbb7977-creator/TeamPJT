@@ -18,14 +18,7 @@
           <UpcomingFestivals />
         </div>
 
-          <section class="mt-6">
-            <h2 class="text-lg font-semibold mb-3">Highlights</h2>
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <FeatureCard title="광안리 야경 투어" desc="저녁 시간 추천 코스와 포토 스팟 안내" tag="추천" img="https://via.placeholder.com/320x180" />
-              <FeatureCard title="국제시장 먹거리 투어" desc="국제시장 근처 맛집과 골목 추천" tag="맛집" img="https://via.placeholder.com/320x180" />
-              <FeatureCard title="해운대 축제 가이드" desc="주말 공연 정보와 준비 팁을 제공합니다" tag="축제" img="https://via.placeholder.com/320x180" />
-            </div>
-          </section>
+          <!-- Highlights removed to avoid duplication with Community Voices -->
       </div>
 
       <aside class="right">

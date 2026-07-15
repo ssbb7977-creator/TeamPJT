@@ -15,20 +15,21 @@
           <router-link to="/board/write" class="border border-white text-white px-4 py-2 rounded-md">커뮤니티 참여</router-link>
         </div>
       </div>
-      <div class="hidden md:block">
-        <div class="bg-white/10 backdrop-blur rounded-xl p-4 border border-white/20">
-          <div class="text-sm text-white/80">오늘의 추천</div>
-          <h3 class="mt-2 font-semibold">해운대 야경 투어</h3>
-          <p class="text-sm text-white/80 mt-1">저녁 시간 추천 코스와 팁을 확인하세요.</p>
+        <div class="hidden md:block">
+          <div class="bg-white/10 backdrop-blur rounded-xl p-4 border border-white/20">
+            <WeatherWidget />
+          </div>
         </div>
-      </div>
     </div>
   </section>
 </template>
 
 <script>
+import WeatherWidget from './WeatherWidget.vue'
+
 export default {
   name: 'HeroBanner',
+  components: { WeatherWidget },
   props: {
     bgImage: { type: String, default: '' }
   },

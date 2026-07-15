@@ -37,7 +37,7 @@ export default {
       const date = (!isNaN(year) && !isNaN(month) && !isNaN(day)) ? new Date(year, month, day) : null
       return { ...it, _eventDate: date }
     })
-    const base = new Date(2026,6,15) // July is month 6 (0-indexed)
+    const base = new Date() // use today's date as base
     const future = parsed.filter(p=>p._eventDate && p._eventDate >= base).sort((a,b)=>a._eventDate - b._eventDate)
     let picks = future.slice(0,3)
     if (picks.length < 3) {
