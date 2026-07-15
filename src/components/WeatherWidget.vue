@@ -60,7 +60,8 @@ export default {
       const c = res.current
       this.temp = Math.round(c.temperature)
       this.summary = mapWeatherCode(c.weathercode)
-      this.displayTime = formatTimeIsoToKorean(c.time)
+      // Show the current local time when displaying weather (cached or fresh)
+      this.displayTime = formatTimeIsoToKorean(new Date().toISOString())
       this.high = res.high !== null ? Math.round(res.high) : null
       this.low = res.low !== null ? Math.round(res.low) : null
     } catch (e) {
