@@ -28,35 +28,37 @@
 </template>
 
 <script>
-const STORAGE_KEY = 'localhub_chat_history_v1'
+import { useChatStore } from '../stores/chat'
+
 export default {
   data() {
-    return { open: false, messages: [], input: '', iconUrl: 'https://img.magnific.com/free-vector/chatbot-chat-message-vectorart_78370-4104.jpg?semt=ais_hybrid&w=740&q=80' }
+    return { open: false, input: '', iconUrl: 'https://img.magnific.com/free-vector/chatbot-chat-message-vectorart_78370-4104.jpg?semt=ais_hybrid&w=740&q=80' }
+  },
+  setup() {
+    const store = useChatStore()
+    return { store }
   },
   mounted() {
-    try { const raw = localStorage.getItem(STORAGE_KEY); if (raw) this.messages = JSON.parse(raw) } catch(e){}
+    // initialize store from storage
+    try { this.store.initFromStorage() } catch(e){}
+    this.$nextTick(()=> this.scrollBottom())
+  },
+  computed: {
+    messages() { return this.store.messages },
+    loading() { return this.store.loading },
+    error() { return this.store.error }
   },
   methods: {
-    toggle() { this.open = !this.open; this.$nextTick(()=> this.scrollBottom()) },
     toggle() { this.open = !this.open; this.$nextTick(()=>{ this.scrollBottom(); if(this.open && this.$refs.inputEl) this.$refs.inputEl.focus(); }) },
     close() { this.open = false },
-    save() { try { localStorage.setItem(STORAGE_KEY, JSON.stringify(this.messages)) } catch(e){} },
     scrollBottom() { const el = this.$refs.msgList; if (el) el.scrollTop = el.scrollHeight },
-    handleSend() {
-      const text = (this.input || '').trim(); if (!text) return
-      const msg = { id: 'm-' + Date.now(), role: 'user', text, ts: Date.now() }
-      this.messages.push(msg)
+    async handleSend() {
+      const text = (this.input || '').trim(); if (!text || this.store.loading) return
       this.input = ''
-      this.save()
+      await this.store.sendMessage(text)
       this.$nextTick(()=> this.scrollBottom())
-      // simple canned assistant reply (placeholder)
-      setTimeout(()=>{
-        const reply = { id: 'm-' + (Date.now()+1), role: 'assistant', text: '응답 준비 중입니다. (테스트 답변)', ts: Date.now()+1 }
-        this.messages.push(reply)
-        this.save()
-        this.$nextTick(()=> this.scrollBottom())
-      }, 600)
-    }
+    },
+    clearHistory() { this.store.clearHistory(); this.$nextTick(()=> this.scrollBottom()) }
   }
 }
 </script>
