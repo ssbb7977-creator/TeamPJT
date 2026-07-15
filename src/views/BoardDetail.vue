@@ -3,25 +3,31 @@
     <div v-if="!post">게시글을 찾을 수 없습니다.</div>
 
     <div v-else>
-      <h1>{{ post.title }}</h1>
-      <div class="meta">{{ new Date(post.createdAt).toLocaleString() }} · {{ post.category }}</div>
+      <div class="bg-white rounded-xl shadow-md overflow-hidden border">
+        <div class="h-48 bg-slate-200 flex items-end p-4">
+          <h1 class="text-2xl font-bold text-white drop-shadow">{{ post.title }}</h1>
+        </div>
+        <div class="p-6">
+          <div class="meta text-sm text-slate-600 mb-4">{{ new Date(post.createdAt).toLocaleString() }} · {{ post.category }}</div>
 
-      <div v-if="!editing" class="content">
-        <p style="white-space:pre-wrap">{{ post.content }}</p>
-      </div>
+          <div v-if="!editing" class="content text-base text-slate-800">
+            <p style="white-space:pre-wrap">{{ post.content }}</p>
+          </div>
 
-      <div v-else class="edit-form">
-        <div class="field"><label>제목</label><input v-model="form.title" /></div>
-        <div class="field"><label>카테고리</label><input v-model="form.category" /></div>
-        <div class="field"><label>내용</label><textarea v-model="form.content" rows="6"></textarea></div>
-      </div>
+          <div v-else class="edit-form">
+            <div class="mb-3"><label class="block text-sm font-medium mb-2">제목</label><input v-model="form.title" class="w-full border rounded px-3 py-2" /></div>
+            <div class="mb-3"><label class="block text-sm font-medium mb-2">카테고리</label><input v-model="form.category" class="w-64 border rounded px-3 py-2" /></div>
+            <div class="mb-3"><label class="block text-sm font-medium mb-2">내용</label><textarea v-model="form.content" rows="6" class="w-full border rounded px-3 py-2"></textarea></div>
+          </div>
 
-      <div class="actions">
-        <button v-if="!editing" @click="startEdit">수정</button>
-        <button v-if="editing" @click="saveEdit">저장</button>
-        <button v-if="editing" @click="cancelEdit">취소</button>
-        <button @click="confirmDelete">삭제</button>
-        <router-link to="/board">목록</router-link>
+          <div class="actions flex gap-3 mt-4">
+            <button v-if="!editing" @click="startEdit" class="px-4 py-2 bg-primary text-white rounded">수정</button>
+            <button v-if="editing" @click="saveEdit" class="px-4 py-2 bg-primary text-white rounded">저장</button>
+            <button v-if="editing" @click="cancelEdit" class="px-4 py-2 border rounded">취소</button>
+            <button @click="confirmDelete" class="px-4 py-2 bg-red-600 text-white rounded">삭제</button>
+            <router-link to="/board" class="px-4 py-2 text-slate-600">목록</router-link>
+          </div>
+        </div>
       </div>
 
       <div v-if="showPassword" class="pwd-modal">
@@ -95,10 +101,8 @@ export default {
 </script>
 
 <style scoped>
-.board-detail { max-width:800px; margin:0 auto }
-.meta { color:#666; font-size:13px; margin-bottom:12px }
-.field { margin-bottom:8px }
-.actions { display:flex; gap:8px; margin-top:12px }
+.board-detail { max-width:900px; margin:0 auto }
+.meta { color:#475569 }
 .pwd-modal { position:fixed; left:0; right:0; top:0; bottom:0; display:flex; align-items:center; justify-content:center; background:rgba(0,0,0,0.4) }
 .pwd-modal .box { background:#fff; padding:16px; border-radius:8px }
 .buttons { display:flex; gap:8px; margin-top:8px }
