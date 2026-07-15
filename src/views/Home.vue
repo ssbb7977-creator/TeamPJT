@@ -10,13 +10,13 @@
         </section>
 
         <section class="map-preview">
-          <h2>추천 관광지 미리보기</h2>
+          <h2>추천 관광지</h2>
           <RecommendedPlaces />
         </section>
 
-          <div class="mt-4">
-            <FestivalList />
-          </div>
+        <div class="mt-4">
+          <UpcomingFestivals />
+        </div>
 
           <section class="mt-6">
             <h2 class="text-lg font-semibold mb-3">Highlights</h2>
@@ -31,9 +31,15 @@
       <aside class="right">
         <WeatherWidget />
         <div style="height:12px"></div>
-        <RecentPosts />
+        <RecommendedPlaces />
       </aside>
     </div>
+
+    <!-- Community Voices (Recent Posts) at bottom -->
+    <section class="mt-10">
+      <h2 class="text-lg font-semibold mb-3">Community Voices</h2>
+      <RecentPosts />
+    </section>
   </div>
 </template>
 
@@ -42,10 +48,11 @@ import RecentPosts from '../components/RecentPosts.vue'
 import WeatherWidget from '../components/WeatherWidget.vue'
 import RecommendedPlaces from '../components/RecommendedPlaces.vue'
 import FestivalList from '../components/FestivalList.vue'
+import UpcomingFestivals from '../components/UpcomingFestivals.vue'
 import HeroBanner from '../components/HeroBanner.vue'
 import FeatureCard from '../components/FeatureCard.vue'
 
-export default { components: { RecentPosts, WeatherWidget, RecommendedPlaces, FestivalList, HeroBanner, FeatureCard } }
+export default { components: { RecentPosts, WeatherWidget, RecommendedPlaces, FestivalList, HeroBanner, FeatureCard, UpcomingFestivals } }
 </script>
 
 <style scoped>
