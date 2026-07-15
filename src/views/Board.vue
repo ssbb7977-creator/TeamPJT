@@ -34,7 +34,7 @@
             </tr>
           </thead>
           <tbody>
-            <BoardRow v-for="p in pagedPosts" :key="p.id" :post="p" />
+            <BoardRow v-for="p in pagedPosts" :key="p.id" :post="p" @updated="reloadPosts" />
           </tbody>
         </table>
       </div>
@@ -94,8 +94,10 @@ export default {
     },
     prevPage() { if (this.page>1) this.page-- },
     nextPage() { if (this.page < this.totalPages) this.page++ },
-    gotoPage(n){ this.page = n }
+    gotoPage(n){ this.page = n },
+    reloadPosts() { this.posts = loadPosts() }
   }
+ 
 }
 </script>
 
