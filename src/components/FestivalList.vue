@@ -3,15 +3,11 @@
     <h2 class="text-lg font-semibold mb-3">축제 및 공연</h2>
     <ul class="space-y-4">
       <li v-for="p in places.slice(0,5)" :key="p.contentid || p.title">
-        <PlaceCard :place="{ title: p.title, addr1: p.addr1, firstimage: p.firstimage }" />
+        <div @click="gotoMap(p)" class="cursor-pointer">
+          <PlaceCard :place="{ title: p.title, addr1: p.addr1, firstimage: p.firstimage }" />
+        </div>
       </li>
-    <ul>
-        <li v-for="p in places.slice(0,5)" :key="p.contentid || p.title">
-          <div @click="gotoMap(p)" class="cursor-pointer">
-            <PlaceCard :place="{ title: p.title, addr1: p.addr1, firstimage: p.firstimage }" />
-          </div>
-        </li>
-      </ul>
+    </ul>
 <script>
 import { loadPlaces } from '../apis/busanData'
 import PlaceCard from './PlaceCard.vue'
