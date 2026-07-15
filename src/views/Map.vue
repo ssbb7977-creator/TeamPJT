@@ -53,7 +53,7 @@
           <button class="text-primary">거리순</button>
         </div>
         <div class="overflow-y-auto pr-2 space-y-4 custom-scrollbar" style="max-height:520px">
-          <div v-for="place in filteredPlaces.slice(0,50)" :key="place.contentid || place.title" class="bg-white rounded-xl p-3 shadow-md border hover:border-primary transition-all cursor-pointer">
+          <div v-for="place in filteredPlaces.slice(0,50)" :key="place.contentid || place.title" @click="focusPlace(place)" class="bg-white rounded-xl p-3 shadow-md border hover:border-primary transition-all cursor-pointer">
             <div class="flex gap-4">
               <div class="w-24 h-24 rounded-lg overflow-hidden flex-shrink-0">
                 <img :src="place.firstimage" class="w-full h-full object-cover" v-if="place.firstimage" />
@@ -71,6 +71,7 @@
               </div>
             </div>
           </div>
+          
         </div>
       </aside>
     </div>
@@ -101,7 +102,8 @@ export default {
       places: [],
       map: null,
       markerLayer: null,
-      mapCentered: false
+      mapCentered: false,
+      markers: {}
     }
   },
   computed: {
@@ -147,6 +149,23 @@ export default {
       // invoked by UI pills
       this.onCategoryChange(val)
     },
+    focusPlace(place) {
+      if (!place) return
+      const key = place.contentid || place.id || place.title
+      const marker = this.markers[key]
+      if (!marker) {
+        console.warn('[Map] marker not found for', key)
+        return
+      }
+      try {
+        this.ensureMap()
+        const latlng = marker.getLatLng()
+        this.map.flyTo(latlng, 15)
+        marker.openPopup()
+      } catch (e) {
+        console.error('[Map] focusPlace error', e)
+      }
+    },
     renderMarkers() {
       if (!this.map || !this.markerLayer) return
       this.$nextTick(() => { try { this.map.invalidateSize() } catch(e) {} })
@@ -154,6 +173,8 @@ export default {
       const cap = 1000
       const items = (this.places || []).slice(0, cap)
       this.markerLayer.clearLayers()
+      // reset markers map
+      this.markers = {}
       items.forEach(p => {
         const lat = parseFloat(p.mapy || p.mapY || p.latitude || 0)
         const lng = parseFloat(p.mapx || p.mapX || p.longitude || 0)
@@ -164,6 +185,9 @@ export default {
         const img = p.firstimage ? `<img src="${p.firstimage}" style="width:140px;height:84px;object-fit:cover;border-radius:6px;margin-bottom:6px;display:block">` : ''
         marker.bindPopup(`${img}<strong>${title}</strong><br/>${addr}`)
         marker.addTo(this.markerLayer)
+        // store marker by id for list->marker interactions
+        const key = p.contentid || p.id || p.title
+        if (key) this.markers[key] = marker
       })
       setTimeout(()=>{ try { this.map.invalidateSize() } catch(e){} }, 300)
       if (items.length && !this.mapCentered) {
