@@ -55,3 +55,29 @@ module.exports = {
 }
 ```
 
+Download & required files
+-------------------------
+If you want to set up this repository on another computer, you can either clone the repo or download a ZIP from GitHub.
+
+Clone via Git (recommended):
+```bash
+git clone https://github.com/ssbb7977-creator/TeamPJT.git
+cd TeamPJT
+npm install
+npm run dev
+```
+
+Or download ZIP: open the repo on GitHub, click `Code` → `Download ZIP`, then extract and run `npm install`.
+
+Essential files you should keep or check after downloading
+- `필수제약.md` — 프로젝트 필수 제약 및 규칙
+- `mvp1.md` — MVP1 목표 및 체크리스트
+- `progress.md` — 작업 진행/기록 파일 (프로젝트 상태 기록)
+
+Quick copy (if you only need those files):
+```bash
+# from a cloned repo root
+cp 필수제약.md mvp1.md progress.md /path/to/destination/
+```
+
+
