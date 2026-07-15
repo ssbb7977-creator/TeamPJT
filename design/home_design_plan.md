@@ -3,44 +3,55 @@
 Source: `home_localhub/code.html`
 
 Goal
-- Implement Home UI matching the reference HTML visuals while keeping UI text and component names in Korean.
-- Add a Floating Chat Bot icon (우측 하단) that opens a compact chat window when clicked (no external server; OpenAI calls already covered elsewhere).
+- Capture visual design intent from `home_localhub/code.html` and produce a true "design plan" focused on visual tokens, component anatomy, layout rules, and interaction specifications — not an implementation task list.
 
-Layout & Sections
-- Top hero: title, short intro (use `Be Vietnam Pro` for headline, `Noto Sans` for body).
-- Right column: `WeatherWidget` (오늘의 날씨) + `RecentPosts` (최근 게시글) + small `RecommendedPlaces` preview.
-- Main column: Banner / Highlights / Festival cards / Promotional cards.
-- Footer: as in design, include attribution text.
+Design Summary
+- Visual theme: "Marine Modern" — deep-sea primary blue for CTAs and interactive elements, pale-sky secondary for accents, warm sandy tertiary for subtle badges.
+- Typography: `Be Vietnam Pro` for headlines, `Noto Sans` for body text; use scale: display-lg (48px), headline-lg (32px), body-md (16px).
+- Spacing & Grid: 12-column desktop grid; gutters 24px; mobile collapse to single column. Use 8px baseline grid for spacing.
+- Elevation: soft ambient shadows (L1/L2) and subtle 1px strokes on cards.
 
-Design Tokens (reuse from DESIGN.md)
-- Colors: primary `#00478d`, secondary pale blue `#A5D8FF`, surface `#f8f9fa`.
-- Spacing: base 8px, md 24px, gutters 24px.
-- Radii: card radius 16px.
+Component Specs
+- `HeroBanner` (large):
+  - Layout: 2-column on desktop; left text content, right promotional card.
+  - Padding: 32px desktop, 20px mobile. Background: gradient using `primary-container` to `primary`.
+  - CTA: primary (filled) + secondary (outline) buttons.
 
-Chatbot Floating Behavior
-- Place a circular chat button at bottom-right, styled with primary color and white icon.
-- Interaction details:
-  - Click toggles a compact chat window (card) above the button.
-  - Chat window size: ~320x420 (mobile responsive: full-width bottom sheet).
-  - Window content: header (title, close button), message list (scrollable), input area with send button.
-  - Persist chat history in `localStorage` for the session.
-  - Use `VITE_OPENAI_KEY` for API if sending messages (respecting rate/cost constraints).
+- `WeatherWidget` (compact):
+  - Card size: ~280x120, shows date, location, current temp and small stats.
 
-Accessibility & UX
-- Chat window accessible by keyboard (focus trap when open), close on ESC.
-- All interactive controls have aria labels.
+- `RecommendedPlaces` / `FestivalList` / `FeatureCard`:
+  - Card radius: 16px, image clipped to top-left radius, text area with tag chip and distance.
 
-Implementation Plan (Steps)
-1. Create `ChatFloating.vue` component: floating button + small chat window (local state + localStorage history). Make it reusable and mount in `AppLayout`.
-2. Integrate `WeatherWidget`, `RecommendedPlaces`, `RecentPosts` into `Home.vue` per design layout.
-3. Style using Tailwind utilities and scoped CSS; follow tokens in `design/DESIGN.md`.
-4. Add small animation for chat open/close and subtle shadow.
-5. Test on mobile: chat window becomes bottom sheet.
+- `ChatFloating` (FAB + sheet):
+  - FAB: 56px circle with provided image; contrast-compliant border if on light background.
+  - Chat window: 320x420 modal above FAB; on mobile becomes bottom sheet (50vh).
+  - Interaction: focus input when opened, ESC to close, save history to `localStorage`.
 
-Acceptance Criteria
-- Home matches reference layout and token rules.
-- Floating Chat opens/closes, maintains local history, is keyboard accessible.
-- No external public API calls for static content; OpenAI usage controlled by `.env` keys.
+Layout Rules
+- Header: sticky top, use `surface` background and subtle border-bottom.
+- Main area: hero (full-width) then content grid (primary column left, sidebar right).
+- Sidebar: fixed max-width and independent vertical scroll for lists; keep map out of home.
 
-Next Action
-- I will implement `ChatFloating.vue` and mount it in `AppLayout.vue`, then wire the Home layout if you want me to proceed now.
+Accessibility
+- All buttons and links must have `aria-label` attributes when icons are used.
+- Color contrast: ensure primary button text on primary background meets AA contrast.
+- Keyboard: chat should trap focus while open; use `role="dialog"` and `aria-modal="true"`.
+
+Interaction Details
+- Festival card click: deep link to `/map?focus=<id>&category=festival` (already implemented); Map must handle this query.
+- FAB: hide when chat open; chat auto-focus on input. Keyboard ESC closes chat.
+
+Design QA Checklist
+- Layout matches the reference (hero, highlights, festivals, sidebar)
+- Spacing and typography use tokens above
+- Components render consistently across breakpoints
+- Chat behavior accessible and persistent local history
+
+Notes for Implementation
+- This document is design-first. Implementation steps exist in `design/board_design_plan.md` as actionable items; keep them separate.
+
+Next Design Task
+- Implement `HeroBanner` visual variants and finalize imagery and copy for production.
+
+
