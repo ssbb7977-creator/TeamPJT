@@ -1,0 +1,417 @@
+<!DOCTYPE html>
+
+<html class="light" lang="ko"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>LocalHub Busan - Marine Modern</title>
+<!-- Google Fonts -->
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&amp;family=Noto+Sans:wght@400;500;600&amp;display=swap" rel="stylesheet"/>
+<!-- Material Symbols -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Tailwind CSS -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-tertiary-fixed-variant": "#504629",
+                        "secondary-fixed-dim": "#9accf3",
+                        "inverse-primary": "#a9c7ff",
+                        "on-background": "#191c1d",
+                        "secondary-container": "#a5d8ff",
+                        "on-secondary-fixed": "#001e2f",
+                        "tertiary-container": "#695e3f",
+                        "outline-variant": "#c2c6d4",
+                        "on-tertiary": "#ffffff",
+                        "on-tertiary-fixed": "#221b03",
+                        "surface": "#f8f9fa",
+                        "error": "#ba1a1a",
+                        "surface-dim": "#d9dadb",
+                        "secondary": "#2e6385",
+                        "primary-fixed": "#d6e3ff",
+                        "on-secondary": "#ffffff",
+                        "tertiary-fixed": "#f1e1b9",
+                        "outline": "#727783",
+                        "primary-container": "#005eb8",
+                        "surface-container-high": "#e7e8e9",
+                        "on-secondary-fixed-variant": "#0c4b6c",
+                        "inverse-on-surface": "#f0f1f2",
+                        "on-primary": "#ffffff",
+                        "on-tertiary-container": "#e8d8b1",
+                        "primary": "#00478d",
+                        "on-surface": "#191c1d",
+                        "on-surface-variant": "#424752",
+                        "surface-bright": "#f8f9fa",
+                        "surface-container-lowest": "#ffffff",
+                        "surface-tint": "#005db6",
+                        "surface-variant": "#e1e3e4",
+                        "secondary-fixed": "#c9e6ff",
+                        "on-error-container": "#93000a",
+                        "surface-container-highest": "#e1e3e4",
+                        "tertiary-fixed-dim": "#d4c59f",
+                        "on-primary-container": "#c8daff",
+                        "primary-fixed-dim": "#a9c7ff",
+                        "on-primary-fixed-variant": "#00468c",
+                        "surface-container-low": "#f3f4f5",
+                        "on-secondary-container": "#285f80",
+                        "background": "#f8f9fa",
+                        "on-primary-fixed": "#001b3d",
+                        "error-container": "#ffdad6",
+                        "on-error": "#ffffff",
+                        "surface-container": "#edeeef",
+                        "inverse-surface": "#2e3132",
+                        "tertiary": "#504629"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "xs": "4px",
+                        "lg": "40px",
+                        "base": "8px",
+                        "xl": "64px",
+                        "md": "24px",
+                        "gutter": "24px",
+                        "margin-mobile": "16px",
+                        "container-max": "1280px",
+                        "sm": "12px"
+                    },
+                    "fontFamily": {
+                        "display-lg": ["Be Vietnam Pro"],
+                        "body-lg": ["Noto Sans"],
+                        "headline-lg": ["Be Vietnam Pro"],
+                        "headline-lg-mobile": ["Be Vietnam Pro"],
+                        "headline-md": ["Be Vietnam Pro"],
+                        "body-md": ["Noto Sans"],
+                        "label-md": ["Noto Sans"],
+                        "label-sm": ["Noto Sans"]
+                    },
+                    "fontSize": {
+                        "display-lg": ["48px", { "lineHeight": "1.2", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                        "body-lg": ["18px", { "lineHeight": "1.6", "fontWeight": "400" }],
+                        "headline-lg": ["32px", { "lineHeight": "1.3", "fontWeight": "600" }],
+                        "headline-lg-mobile": ["24px", { "lineHeight": "1.3", "fontWeight": "600" }],
+                        "headline-md": ["24px", { "lineHeight": "1.4", "fontWeight": "600" }],
+                        "body-md": ["16px", { "lineHeight": "1.6", "fontWeight": "400" }],
+                        "label-md": ["14px", { "lineHeight": "1.4", "letterSpacing": "0.01em", "fontWeight": "500" }],
+                        "label-sm": ["12px", { "lineHeight": "1.2", "fontWeight": "600" }]
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            display: inline-block;
+            vertical-align: middle;
+        }
+        .hide-scrollbar::-webkit-scrollbar { display: none; }
+        .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        
+        .ambient-shadow-l1 { box-shadow: 0 2px 8px rgba(0,0,0,0.04); }
+        .ambient-shadow-l2 { box-shadow: 0 4px 16px rgba(0,0,0,0.08); }
+        
+        .seagull-badge {
+            background-color: #f1e1b9; /* tertiary-fixed */
+            color: #504629; /* on-tertiary-fixed-variant */
+        }
+    </style>
+</head>
+<body class="bg-background text-on-surface font-body-md">
+<!-- TopNavBar -->
+<nav class="sticky top-0 z-50 bg-surface shadow-sm border-b border-outline-variant w-full">
+<div class="flex justify-between items-center px-gutter py-4 w-full max-w-container-max mx-auto">
+<div class="font-headline-md text-headline-md font-bold text-primary flex items-center gap-2">
+<span class="material-symbols-outlined text-primary" style="font-variation-settings: 'FILL' 1;">waves</span>
+                LocalHub
+            </div>
+<div class="hidden md:flex items-center gap-lg">
+<a class="text-primary border-b-2 border-primary font-bold pb-1 font-label-md text-label-md" href="#">Home</a>
+<a class="text-on-surface-variant hover:text-primary transition-colors font-label-md text-label-md" href="#">Map</a>
+<a class="text-on-surface-variant hover:text-primary transition-colors font-label-md text-label-md" href="#">Board</a>
+</div>
+<div class="flex items-center gap-sm">
+<button class="p-2 hover:bg-surface-container-low rounded-lg transition-colors active:scale-95 duration-150">
+<span class="material-symbols-outlined text-on-surface-variant">search</span>
+</button>
+<button class="p-2 hover:bg-surface-container-low rounded-lg transition-colors active:scale-95 duration-150">
+<span class="material-symbols-outlined text-on-surface-variant">account_circle</span>
+</button>
+</div>
+</div>
+</nav>
+<main class="w-full">
+<!-- Hero Section -->
+<section class="relative w-full overflow-hidden bg-primary-container py-xl md:py-24">
+<!-- Animated Atmosphere Layer -->
+<div class="absolute inset-0 opacity-20 pointer-events-none">
+<div class="absolute top-0 right-0 w-96 h-96 bg-secondary-container rounded-full blur-[100px] animate-pulse"></div>
+<div class="absolute bottom-0 left-0 w-64 h-64 bg-tertiary-fixed rounded-full blur-[80px]"></div>
+</div>
+<div class="relative z-10 max-w-container-max mx-auto px-gutter grid md:grid-cols-2 gap-md items-center">
+<div class="text-on-primary">
+<div class="flex items-center gap-2 mb-base">
+<span class="seagull-badge px-3 py-1 rounded-full font-label-sm text-label-sm flex items-center gap-1">
+<span class="material-symbols-outlined text-[16px]">sailing</span> Verified Busan Guide
+                        </span>
+</div>
+<h1 class="font-display-lg text-display-lg mb-base leading-tight">Welcome to <br/>Busan LocalHub</h1>
+<p class="font-body-lg text-body-lg text-on-primary-container/90 max-w-md mb-lg">
+                        Your digital gateway to the marine capital. Discover local events, hidden gems, and community insights.
+                    </p>
+<div class="flex flex-wrap gap-base">
+<button class="bg-on-primary-container text-primary font-bold px-md py-sm rounded-md active:scale-95 transition-all">Explore Map</button>
+<button class="border border-on-primary-container text-on-primary-container font-bold px-md py-sm rounded-md hover:bg-on-primary-container/10 active:scale-95 transition-all">Join Community</button>
+</div>
+</div>
+<!-- Live Weather & Date Card -->
+<div class="bg-surface/10 backdrop-blur-md rounded-xl p-md border border-white/20 text-on-primary ambient-shadow-l2">
+<div class="flex justify-between items-start mb-lg">
+<div>
+<p class="font-label-md text-label-md uppercase tracking-wider opacity-80" id="current-date">October 24, 2023</p>
+<h3 class="font-headline-md text-headline-md">Haeundae District</h3>
+</div>
+<span class="material-symbols-outlined text-4xl" style="font-variation-settings: 'FILL' 1;">sunny</span>
+</div>
+<div class="grid grid-cols-3 gap-base text-center">
+<div class="p-base rounded-lg bg-white/5">
+<p class="text-label-sm opacity-70">Temp</p>
+<p class="text-headline-md font-bold">22°C</p>
+</div>
+<div class="p-base rounded-lg bg-white/5">
+<p class="text-label-sm opacity-70">Humidity</p>
+<p class="text-headline-md font-bold">45%</p>
+</div>
+<div class="p-base rounded-lg bg-white/5">
+<p class="text-label-sm opacity-70">Wind</p>
+<p class="text-headline-md font-bold">3m/s</p>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Upcoming Festivals Section (Bento-ish Grid) -->
+<section class="max-w-container-max mx-auto px-gutter py-xl">
+<div class="flex justify-between items-end mb-lg">
+<div>
+<h2 class="font-headline-lg text-headline-lg text-primary">Upcoming Festivals</h2>
+<p class="text-on-surface-variant font-body-md">Don't miss out on the local energy</p>
+</div>
+<a class="text-primary font-bold flex items-center gap-1 hover:underline" href="#">
+                    View All <span class="material-symbols-outlined">arrow_forward</span>
+</a>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-12 gap-base h-auto md:h-[500px]">
+<!-- Featured Festival -->
+<div class="md:col-span-7 relative group overflow-hidden rounded-xl ambient-shadow-l1 cursor-pointer">
+<div class="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent z-10"></div>
+<div class="absolute inset-0 bg-cover bg-center group-hover:scale-105 transition-transform duration-700" data-alt="A grand evening display of a massive fireworks festival over a coastal bridge in Busan. The Gwangandaegyo Bridge is illuminated with colorful pyrotechnics reflecting on the dark blue ocean water. Thousands of people are gathered on the sandy Haeundae beach in the foreground. The atmosphere is celebratory and electric with deep blues and brilliant bursts of gold and red." style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuBXeALL9sRabhEp9Pt3T881_KbssJnh0ZUCnyR2FS7tqbWbnzEpvA6rtds5aDB9mOe9DTg5Oefzzq5u9KrfoPrycAFhf6-_2Yq1rWgePPiixBuB_OvLxPtsZyjijlL7teB7b9ZytAjXQr6Wsy4mQRVfOt2b57XNVORVSRXr2Qjhk-lM7RBmtC_mkYDXhKeRU3Wfvtk4qKOsrMuclMig7wuoWcO3YKbKMHCBgHXI9Q5RHDIUENmjvtoBvzVomR86aH69Yz0rNzNV-g')">
+</div>
+<div class="absolute bottom-0 left-0 p-md z-20 text-white">
+<span class="bg-secondary text-on-secondary px-3 py-1 rounded-full text-label-sm mb-base inline-block">Nov 04 - Nov 05</span>
+<h3 class="font-headline-lg text-headline-lg mb-xs">Busan Fireworks Festival</h3>
+<p class="text-white/80 max-w-md">The most spectacular night sky event over Gwangalli Beach.</p>
+</div>
+</div>
+<div class="md:col-span-5 grid grid-rows-2 gap-base">
+<!-- Small Festival 1 -->
+<div class="relative group overflow-hidden rounded-xl ambient-shadow-l1 cursor-pointer">
+<div class="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent z-10"></div>
+<div class="absolute inset-0 bg-cover bg-center group-hover:scale-105 transition-transform duration-700" data-alt="A vibrant daytime view of the Busan International Film Festival red carpet event. Modern architectural marvels of the Cinema Center with its giant cantilever roof serve as the backdrop. Papparazzi and fans line the edges under bright, sunny skies. The aesthetic is professional, high-end, and cinematic with crisp daylight and polished surfaces." style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuCBPWHc1hMdh2JLXruU6Hiadsynglau7jHosPP06q00UcZjdfp3y6fZRsFtqUUcRqEo9XWOF56j_bvnASlyI8lo7KszkKzWtJHbzERFXfdYXiVn4RlimImGy1I-OsmQ9Bp34l4fMAezWoWA_jBzgfKWV15mTg0BSeVvR9FsHi8tHhdyMoodecleGQUKyROfgnySE1IWAM2OmwSnByh1bYc6AubEVgRw9Fs5NgjnSdjZKc6Qr5mpCnNwWP6jZrfI2ifjTySp91J72Q')">
+</div>
+<div class="absolute bottom-0 left-0 p-md z-20 text-white">
+<span class="bg-secondary-container text-on-secondary-container px-3 py-1 rounded-full text-label-sm mb-xs inline-block">Oct 04 - Oct 13</span>
+<h4 class="font-headline-md text-headline-md">BIFF 2024</h4>
+</div>
+</div>
+<!-- Small Festival 2 -->
+<div class="relative group overflow-hidden rounded-xl ambient-shadow-l1 cursor-pointer">
+<div class="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent z-10"></div>
+<div class="absolute inset-0 bg-cover bg-center group-hover:scale-105 transition-transform duration-700" data-alt="A colorful autumn morning at the Jagalchi Fishery Festival in Busan. Stalls filled with fresh seafood are lined along the pier with the blue sea and fishing boats in the background. Local people in traditional hanbok and modern attire celebrate together. The lighting is warm and natural, emphasizing the rich textures and vibrant local culture." style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuDAKjJP8rSoomprN90JQvAqq2sCdOvRxVRMwZiiGUW_LBsI-_dUdQdPIE5goxmPhX9Ac2-OGrKGoKWxANVAh_y74jzp7rm7oBLQxVQ4cI1Vwg3J1MX44RtjMvDQzIpzjyXE_ezYx4_VDJg8C03ao3X_lwIENep5AUtTdMhDHocDc9vbF-G3CIEj6p33KJvucfOGzhzZccNJLK1aI6uG99332s3UNIvYBId9AlLPSk3e4WELp5W3uY30G7CEpSFv_0Q21vVUJgWQZw')">
+</div>
+<div class="absolute bottom-0 left-0 p-md z-20 text-white">
+<span class="bg-secondary-container text-on-secondary-container px-3 py-1 rounded-full text-label-sm mb-xs inline-block">Oct 19 - Oct 22</span>
+<h4 class="font-headline-md text-headline-md">Jagalchi Festival</h4>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Recommended Attractions Carousel -->
+<section class="bg-surface-container-low py-xl overflow-hidden">
+<div class="max-w-container-max mx-auto px-gutter mb-lg">
+<h2 class="font-headline-lg text-headline-lg text-primary">Recommended Attractions</h2>
+<p class="text-on-surface-variant font-body-md">Hand-picked locations for your next visit</p>
+</div>
+<div class="flex gap-md overflow-x-auto px-gutter hide-scrollbar scroll-smooth pb-base">
+<!-- Attraction Cards (Repeated Pattern) -->
+<script>
+                    const attractions = [
+                        { name: "Gamcheon Culture Village", rating: 4.8, type: "Art & Views", img: "A wide-angle, vibrant photograph of the colorful houses terraced on a hillside in Gamcheon Culture Village, Busan. The sky is a clear pale blue, and the sunlight creates soft shadows between the pastel-colored buildings. Street art and sculptures are visible in the foreground, creating a whimsical and artistic atmosphere." },
+                        { name: "Haedong Yonggungsa", rating: 4.9, type: "Temple", img: "A serene coastal scene of Haedong Yonggungsa Temple built directly onto the rocky cliffs overlooking the deep blue East Sea. Waves crash gently against the rocks. The Buddhist temple architecture is intricate and traditional, surrounded by lush green pine trees under a golden sunrise." },
+                        { name: "Haeundae Blueline Park", rating: 4.7, type: "Park", img: "A modern coastal railway known as the Beach Train traveling along a scenic seaside cliff in Busan. The small, colorful capsules of the Sky Capsule are seen floating on an elevated track against a background of the vast ocean and clear horizon. The aesthetic is clean, modern, and refreshing." },
+                        { name: "Gwangalli Beach", rating: 4.6, type: "Beach", img: "A panoramic evening view of Gwangalli Beach with the majestic Diamond Bridge illuminated in the distance. The shoreline has a gentle curve with city lights reflecting in the wet sand. People are enjoying a quiet walk. The mood is romantic and peaceful with cool blue and violet tones." },
+                        { name: "Taejongdae Park", rating: 4.5, type: "Nature", img: "High-angle view of the dramatic rocky cliffs of Taejongdae Park in Busan. A white lighthouse stands tall against the deep sapphire ocean. Dense green forests cover the hills. The lighting is bright and airy, showcasing the natural rugged beauty of the coastal landscape." },
+                        { name: "Songdo Cable Car", rating: 4.8, type: "Experience", img: "Sleek, modern cable cars with glass floors soaring over the ocean at Songdo Beach. Below, the clear turquoise water and the Songdo Cloud Trails are visible. Distant cargo ships sit on the horizon. The design is airy and emphasizes height and transparency." },
+                        { name: "BIFF Square", rating: 4.4, type: "Shopping", img: "A bustling street scene at BIFF Square in Nampo-dong, Busan. Neon signs glow as evening falls, illuminating the handprints of famous filmmakers on the pavement. Street food vendors steam with delicious local snacks. The scene is high-density, energetic, and full of urban life." },
+                        { name: "Oryukdo Skywalk", rating: 4.6, type: "Viewpoint", img: "A dramatic perspective of the U-shaped glass skywalk extending over a 35-meter coastal cliff at Oryukdo. The sea below is turbulent and deep green. The rocky Oryukdo islands are visible in the distance. The mood is adventurous and crisp with high-key lighting." },
+                        { name: "F1963 Cultural Space", rating: 4.7, type: "Art & Cafe", img: "A trendy, industrial-chic cultural complex converted from an old wire factory. The interior features exposed steel beams, large bookshelves, and minimalist art galleries. High ceilings and soft industrial lighting create a sophisticated, modern community hub atmosphere." },
+                        { name: "Dongbaekseom Island", rating: 4.5, type: "Hiking", img: "A peaceful walking path winding through a forest of camellia and pine trees on Dongbaek Island. Glimpses of the modern Haeundae skyline are visible through the branches. The lighting is dappled sunlight filtering through the leaves, creating a calm, natural retreat." }
+                    ];
+
+                    document.write(attractions.map(attr => `
+                        <div class="min-w-[280px] md:min-w-[320px] bg-white rounded-xl overflow-hidden ambient-shadow-l1 hover:ambient-shadow-l2 transition-all group cursor-pointer flex-shrink-0">
+                            <div class="h-48 overflow-hidden relative">
+                                <div class="absolute inset-0 bg-cover bg-center group-hover:scale-110 transition-transform duration-500" 
+                                     style="background-image: url('placeholder')" 
+                                     data-alt="${attr.img}"></div>
+                                <div class="absolute top-base right-base bg-white/90 backdrop-blur px-2 py-1 rounded-lg flex items-center gap-1">
+                                    <span class="material-symbols-outlined text-yellow-500 text-[16px]" style="font-variation-settings: 'FILL' 1;">star</span>
+                                    <span class="text-label-sm font-bold text-on-surface">${attr.rating}</span>
+                                </div>
+                            </div>
+                            <div class="p-md">
+                                <span class="text-primary font-label-sm uppercase tracking-wider">${attr.type}</span>
+                                <h4 class="font-headline-md text-headline-md mt-xs text-on-surface group-hover:text-primary transition-colors">${attr.name}</h4>
+                                <div class="flex items-center gap-1 mt-base text-on-surface-variant">
+                                    <span class="material-symbols-outlined text-[18px]">location_on</span>
+                                    <span class="text-label-md">Busan, KR</span>
+                                </div>
+                            </div>
+                        </div>
+                    `).join(''));
+                </script>
+</div>
+</section>
+<!-- Community Recent Posts -->
+<section class="max-w-container-max mx-auto px-gutter py-xl">
+<div class="grid lg:grid-cols-3 gap-xl">
+<div class="lg:col-span-1">
+<h2 class="font-headline-lg text-headline-lg text-primary mb-base">Community Voices</h2>
+<p class="text-on-surface-variant font-body-md mb-lg">Join the conversation with local residents and travelers alike.</p>
+<button class="w-full bg-primary text-on-primary font-bold py-md rounded-md flex items-center justify-center gap-2 hover:bg-primary-container transition-colors">
+<span class="material-symbols-outlined">edit_note</span> Start a Discussion
+                    </button>
+</div>
+<div class="lg:col-span-2 space-y-base">
+<!-- Post 1 -->
+<div class="bg-surface border-b border-outline-variant p-md hover:bg-surface-container-low transition-all cursor-pointer group">
+<div class="flex items-start justify-between">
+<div class="flex gap-md">
+<div class="w-12 h-12 rounded-full overflow-hidden bg-primary-fixed flex items-center justify-center">
+<span class="material-symbols-outlined text-primary">person</span>
+</div>
+<div>
+<h5 class="font-headline-md text-headline-md group-hover:text-primary transition-colors">Best spots for sunrise photography in Oct?</h5>
+<p class="text-on-surface-variant line-clamp-1 mt-xs">Hey everyone, I'm visiting next week and looking for some quiet spots near Songjeong...</p>
+<div class="flex items-center gap-md mt-md text-label-sm text-outline">
+<span class="flex items-center gap-1"><span class="material-symbols-outlined text-[16px]">forum</span> 12 Replies</span>
+<span class="flex items-center gap-1"><span class="material-symbols-outlined text-[16px]">schedule</span> 2 hours ago</span>
+</div>
+</div>
+</div>
+<span class="seagull-badge px-2 py-1 rounded text-label-sm">Photography</span>
+</div>
+</div>
+<!-- Post 2 -->
+<div class="bg-surface border-b border-outline-variant p-md hover:bg-surface-container-low transition-all cursor-pointer group">
+<div class="flex items-start justify-between">
+<div class="flex gap-md">
+<div class="w-12 h-12 rounded-full overflow-hidden bg-secondary-fixed flex items-center justify-center">
+<span class="material-symbols-outlined text-secondary">waves</span>
+</div>
+<div>
+<h5 class="font-headline-md text-headline-md group-hover:text-primary transition-colors">Haeundae Night Market Food Review</h5>
+<p class="text-on-surface-variant line-clamp-1 mt-xs">Just tried the spicy tteokbokki at the third stall from the entrance. Absolutely incredible...</p>
+<div class="flex items-center gap-md mt-md text-label-sm text-outline">
+<span class="flex items-center gap-1"><span class="material-symbols-outlined text-[16px]">forum</span> 45 Replies</span>
+<span class="flex items-center gap-1"><span class="material-symbols-outlined text-[16px]">schedule</span> 5 hours ago</span>
+</div>
+</div>
+</div>
+<span class="seagull-badge px-2 py-1 rounded text-label-sm">Food</span>
+</div>
+</div>
+<!-- Post 3 -->
+<div class="bg-surface border-b border-outline-variant p-md hover:bg-surface-container-low transition-all cursor-pointer group">
+<div class="flex items-start justify-between">
+<div class="flex gap-md">
+<div class="w-12 h-12 rounded-full overflow-hidden bg-tertiary-fixed flex items-center justify-center">
+<span class="material-symbols-outlined text-tertiary">directions_bus</span>
+</div>
+<div>
+<h5 class="font-headline-md text-headline-md group-hover:text-primary transition-colors">Reminder: Temporary bus route changes</h5>
+<p class="text-on-surface-variant line-clamp-1 mt-xs">Due to the festival prep, buses 1003 and 38 will be detouring through Nampo starting Friday...</p>
+<div class="flex items-center gap-md mt-md text-label-sm text-outline">
+<span class="flex items-center gap-1"><span class="material-symbols-outlined text-[16px]">forum</span> 8 Replies</span>
+<span class="flex items-center gap-1"><span class="material-symbols-outlined text-[16px]">schedule</span> 1 day ago</span>
+</div>
+</div>
+</div>
+<span class="seagull-badge px-2 py-1 rounded text-label-sm">Alert</span>
+</div>
+</div>
+</div>
+</div>
+</section>
+</main>
+<!-- Footer -->
+<footer class="bg-surface-container border-t border-outline-variant w-full">
+<div class="flex flex-col gap-base items-center justify-center py-xl px-gutter w-full max-w-container-max mx-auto text-center">
+<div class="font-headline-md text-headline-md font-bold text-primary mb-base">LocalHub</div>
+<div class="flex flex-wrap justify-center gap-md mb-md">
+<a class="text-on-surface-variant hover:text-primary transition-colors underline font-label-md" href="#">Privacy Policy</a>
+<a class="text-on-surface-variant hover:text-primary transition-colors underline font-label-md" href="#">Terms of Service</a>
+<a class="text-on-surface-variant hover:text-primary transition-colors underline font-label-md" href="#">Contact Us</a>
+</div>
+<p class="text-secondary font-body-md max-w-2xl">
+                이 서비스는 한국관광공사 Tour API(TourAPI 4.0)의 데이터를 활용하였습니다. 출처: 한국관광공사 (data.go.kr)
+            </p>
+<p class="text-on-surface-variant font-label-sm">
+                라이선스: 공공누리 제3유형(출처표시·변경금지)
+            </p>
+<p class="text-on-surface-variant font-label-sm mt-md opacity-70">
+                © 2024 LocalHub Busan. All rights reserved.
+            </p>
+</div>
+</footer>
+<!-- FAB for quick action (Home context) -->
+<button class="fixed bottom-base right-base md:bottom-md md:right-md bg-primary text-on-primary w-14 h-14 rounded-full shadow-lg flex items-center justify-center active:scale-90 transition-transform z-40">
+<span class="material-symbols-outlined">map</span>
+</button>
+<script>
+        // Update current date display
+        const dateEl = document.getElementById('current-date');
+        const now = new Date();
+        const options = { month: 'long', day: 'numeric', year: 'numeric' };
+        dateEl.textContent = now.toLocaleDateString('en-US', options);
+
+        // Simple smooth horizontal scroll helper for carousel
+        const carousel = document.querySelector('.overflow-x-auto');
+        let isDown = false;
+        let startX;
+        let scrollLeft;
+
+        carousel.addEventListener('mousedown', (e) => {
+            isDown = true;
+            startX = e.pageX - carousel.offsetLeft;
+            scrollLeft = carousel.scrollLeft;
+        });
+        carousel.addEventListener('mouseleave', () => { isDown = false; });
+        carousel.addEventListener('mouseup', () => { isDown = false; });
+        carousel.addEventListener('mousemove', (e) => {
+            if(!isDown) return;
+            e.preventDefault();
+            const x = e.pageX - carousel.offsetLeft;
+            const walk = (x - startX) * 2;
+            carousel.scrollLeft = scrollLeft - walk;
+        });
+    </script>
+</body></html>

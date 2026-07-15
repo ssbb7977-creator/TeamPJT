@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+
+<html class="light" lang="ko"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>LocalHub Busan - Community Board</title>
+<!-- Fonts & Icons -->
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&amp;family=Noto+Sans:wght@400;500;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "on-tertiary-fixed-variant": "#504629",
+                    "secondary-fixed-dim": "#9accf3",
+                    "inverse-primary": "#a9c7ff",
+                    "on-background": "#191c1d",
+                    "secondary-container": "#a5d8ff",
+                    "on-secondary-fixed": "#001e2f",
+                    "tertiary-container": "#695e3f",
+                    "outline-variant": "#c2c6d4",
+                    "on-tertiary": "#ffffff",
+                    "on-tertiary-fixed": "#221b03",
+                    "surface": "#f8f9fa",
+                    "error": "#ba1a1a",
+                    "surface-dim": "#d9dadb",
+                    "secondary": "#2e6385",
+                    "primary-fixed": "#d6e3ff",
+                    "on-secondary": "#ffffff",
+                    "tertiary-fixed": "#f1e1b9",
+                    "outline": "#727783",
+                    "primary-container": "#005eb8",
+                    "surface-container-high": "#e7e8e9",
+                    "on-secondary-fixed-variant": "#0c4b6c",
+                    "inverse-on-surface": "#f0f1f2",
+                    "on-primary": "#ffffff",
+                    "on-tertiary-container": "#e8d8b1",
+                    "primary": "#00478d",
+                    "on-surface": "#191c1d",
+                    "on-surface-variant": "#424752",
+                    "surface-bright": "#f8f9fa",
+                    "surface-container-lowest": "#ffffff",
+                    "surface-tint": "#005db6",
+                    "surface-variant": "#e1e3e4",
+                    "secondary-fixed": "#c9e6ff",
+                    "on-error-container": "#93000a",
+                    "surface-container-highest": "#e1e3e4",
+                    "tertiary-fixed-dim": "#d4c59f",
+                    "on-primary-container": "#c8daff",
+                    "primary-fixed-dim": "#a9c7ff",
+                    "on-primary-fixed-variant": "#00468c",
+                    "surface-container-low": "#f3f4f5",
+                    "on-secondary-container": "#285f80",
+                    "background": "#f8f9fa",
+                    "on-primary-fixed": "#001b3d",
+                    "error-container": "#ffdad6",
+                    "on-error": "#ffffff",
+                    "surface-container": "#edeeef",
+                    "inverse-surface": "#2e3132",
+                    "tertiary": "#504629"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "xs": "4px",
+                    "lg": "40px",
+                    "base": "8px",
+                    "xl": "64px",
+                    "md": "24px",
+                    "gutter": "24px",
+                    "margin-mobile": "16px",
+                    "container-max": "1280px",
+                    "sm": "12px"
+            },
+            "fontFamily": {
+                    "display-lg": ["Be Vietnam Pro"],
+                    "body-lg": ["Noto Sans"],
+                    "headline-lg": ["Be Vietnam Pro"],
+                    "headline-md": ["Be Vietnam Pro"],
+                    "body-md": ["Noto Sans"],
+                    "label-md": ["Noto Sans"],
+                    "label-sm": ["Noto Sans"]
+            }
+          }
+        }
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .active-tab-indicator {
+            view-transition-name: active-tab;
+        }
+        .glass-card {
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+    </style>
+</head>
+<body class="bg-background text-on-background font-body-md min-h-screen flex flex-col">
+<!-- TopNavBar -->
+<header class="bg-surface sticky top-0 z-50 shadow-sm border-b border-outline-variant">
+<div class="flex justify-between items-center px-gutter py-4 w-full max-w-container-max mx-auto">
+<div class="flex items-center gap-base">
+<span class="material-symbols-outlined text-primary text-3xl" style="font-variation-settings: 'FILL' 1;">waves</span>
+<h1 class="font-headline-md text-headline-md font-bold text-primary">LocalHub</h1>
+</div>
+<nav class="hidden md:flex items-center gap-lg">
+<a class="text-on-surface-variant hover:text-primary transition-colors font-label-md text-label-md" href="#">Home</a>
+<a class="text-on-surface-variant hover:text-primary transition-colors font-label-md text-label-md" href="#">Map</a>
+<a class="text-primary border-b-2 border-primary font-bold pb-1 font-label-md text-label-md" href="#">Board</a>
+</nav>
+<div class="flex items-center gap-md">
+<button class="p-2 hover:bg-surface-container-low rounded-lg transition-transform active:scale-95">
+<span class="material-symbols-outlined text-on-surface-variant">search</span>
+</button>
+<button class="p-2 hover:bg-surface-container-low rounded-lg transition-transform active:scale-95">
+<span class="material-symbols-outlined text-on-surface-variant">account_circle</span>
+</button>
+</div>
+</div>
+</header>
+<main class="flex-grow w-full max-w-container-max mx-auto px-gutter py-xl">
+<!-- Page Header & State Controller -->
+<div class="flex flex-col md:flex-row md:items-end justify-between gap-md mb-xl">
+<div>
+<div class="flex items-center gap-xs text-secondary font-label-md mb-xs">
+<span class="material-symbols-outlined text-sm">sailing</span>
+<span>Community Square</span>
+</div>
+<h2 class="font-headline-lg text-headline-lg text-on-surface font-extrabold tracking-tight">Board &amp; Discussions</h2>
+<p class="text-on-surface-variant font-body-md mt-2">Connect with the Busan community, share local tips, and discover events.</p>
+</div>
+<div class="flex bg-surface-container-low p-1 rounded-xl shadow-sm border border-outline-variant/30">
+<button class="px-md py-base rounded-lg font-label-md transition-all duration-200 bg-primary text-on-primary shadow-sm active-tab-indicator" id="tab-list" onclick="switchView('list')">
+                    Post List
+                </button>
+<button class="px-md py-base rounded-lg font-label-md transition-all duration-200 text-on-surface-variant hover:bg-surface-container-high" id="tab-write" onclick="switchView('write')">
+                    Write Post
+                </button>
+</div>
+</div>
+<!-- POST LIST VIEW -->
+<div class="space-y-md" id="view-list">
+<!-- Filter Bar -->
+<div class="flex flex-wrap items-center gap-sm mb-md">
+<span class="px-4 py-1.5 rounded-full bg-secondary-container text-on-secondary-container font-label-sm flex items-center gap-1">
+<span class="material-symbols-outlined text-sm">stars</span> Local Verified
+                </span>
+<span class="px-4 py-1.5 rounded-full bg-surface-container-high text-on-surface-variant font-label-sm">#Haeundae</span>
+<span class="px-4 py-1.5 rounded-full bg-surface-container-high text-on-surface-variant font-label-sm">#Surfing</span>
+<span class="px-4 py-1.5 rounded-full bg-surface-container-high text-on-surface-variant font-label-sm">#NightMarket</span>
+</div>
+<!-- Bento-style Table/List -->
+<div class="bg-surface rounded-2xl border border-outline-variant overflow-hidden shadow-[0_2px_8px_rgba(0,0,0,0.04)]">
+<div class="overflow-x-auto">
+<table class="w-full text-left border-collapse">
+<thead class="bg-surface-container-low text-on-surface-variant border-b border-outline-variant">
+<tr>
+<th class="px-md py-4 font-label-md">Title</th>
+<th class="px-md py-4 font-label-md">Author</th>
+<th class="px-md py-4 font-label-md hidden md:table-cell">Date</th>
+<th class="px-md py-4 font-label-md text-right">Views</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-outline-variant/50">
+<tr class="group cursor-pointer hover:bg-surface-container-lowest transition-colors" onclick="switchView('detail')">
+<td class="px-md py-4">
+<div class="flex items-center gap-sm">
+<span class="material-symbols-outlined text-secondary opacity-0 group-hover:opacity-100 transition-opacity">arrow_forward_ios</span>
+<span class="font-body-md text-on-surface font-medium group-hover:text-primary">Best sunset spots in Gwangalli this weekend?</span>
+</div>
+</td>
+<td class="px-md py-4">
+<div class="flex items-center gap-2">
+<div class="w-6 h-6 rounded-full bg-primary-fixed flex items-center justify-center text-[10px] font-bold text-primary">JK</div>
+<span class="text-on-surface-variant text-label-md">BusanLocal_92</span>
+</div>
+</td>
+<td class="px-md py-4 text-on-surface-variant text-label-md hidden md:table-cell">Oct 24, 2024</td>
+<td class="px-md py-4 text-right text-on-surface-variant text-label-md">1,240</td>
+</tr>
+<tr class="group cursor-pointer hover:bg-surface-container-lowest transition-colors">
+<td class="px-md py-4">
+<div class="flex items-center gap-sm">
+<span class="material-symbols-outlined text-secondary opacity-0 group-hover:opacity-100 transition-opacity">arrow_forward_ios</span>
+<span class="font-body-md text-on-surface font-medium group-hover:text-primary">[Notice] Marine City Flea Market opening next Sat</span>
+</div>
+</td>
+<td class="px-md py-4">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-tertiary text-lg" style="font-variation-settings: 'FILL' 1;">verified</span>
+<span class="text-on-surface-variant text-label-md">Admin_Hub</span>
+</div>
+</td>
+<td class="px-md py-4 text-on-surface-variant text-label-md hidden md:table-cell">Oct 22, 2024</td>
+<td class="px-md py-4 text-right text-on-surface-variant text-label-md">3,892</td>
+</tr>
+<tr class="group cursor-pointer hover:bg-surface-container-lowest transition-colors">
+<td class="px-md py-4">
+<div class="flex items-center gap-sm">
+<span class="material-symbols-outlined text-secondary opacity-0 group-hover:opacity-100 transition-opacity">arrow_forward_ios</span>
+<span class="font-body-md text-on-surface font-medium group-hover:text-primary">Where can I find the best Dwaeji-gukbap near the station?</span>
+</div>
+</td>
+<td class="px-md py-4">
+<div class="flex items-center gap-2 text-on-surface-variant text-label-md">SeasideWalker</div>
+</td>
+<td class="px-md py-4 text-on-surface-variant text-label-md hidden md:table-cell">Oct 21, 2024</td>
+<td class="px-md py-4 text-right text-on-surface-variant text-label-md">845</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<!-- Pagination -->
+<div class="flex items-center justify-center gap-base mt-lg">
+<button class="w-10 h-10 flex items-center justify-center rounded-lg border border-outline-variant hover:bg-surface-container-low"><span class="material-symbols-outlined">chevron_left</span></button>
+<button class="w-10 h-10 flex items-center justify-center rounded-lg bg-primary text-on-primary font-bold">1</button>
+<button class="w-10 h-10 flex items-center justify-center rounded-lg border border-outline-variant hover:bg-surface-container-low">2</button>
+<button class="w-10 h-10 flex items-center justify-center rounded-lg border border-outline-variant hover:bg-surface-container-low">3</button>
+<button class="w-10 h-10 flex items-center justify-center rounded-lg border border-outline-variant hover:bg-surface-container-low"><span class="material-symbols-outlined">chevron_right</span></button>
+</div>
+</div>
+<!-- POST DETAIL VIEW -->
+<div class="hidden max-w-4xl mx-auto" id="view-detail">
+<button class="flex items-center gap-1 text-primary font-label-md mb-md hover:underline" onclick="switchView('list')">
+<span class="material-symbols-outlined text-sm">arrow_back</span> Back to list
+            </button>
+<article class="bg-surface rounded-2xl border border-outline-variant shadow-lg overflow-hidden mb-lg">
+<div class="h-64 relative bg-primary-fixed/20">
+<img class="w-full h-full object-cover" data-alt="A cinematic, high-resolution photograph of Gwangalli Beach at twilight in Busan. The majestic Diamond Bridge is illuminated with soft blue and purple LED lights, reflecting on the calm sea surface. The foreground shows a clean sandy beach with modern urban silhouettes in the distance. The overall lighting is moody, sophisticated, and tranquil, fitting a premium coastal community aesthetic." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDg7Q8bKzVPc5wdGSpxlGsBL1YbsLJhkOteFaaHnLGy30mfyyZRw6ZG8Jpc8rBnGyqocABGFJ-oCA3NaL1bKZKf_Ov-V8rWPGrZneflYA2PTTp_XZPpEPolxlBDj2vL-2Eaeqk8BCYTSOQwNKZ-SAlH104R2UNBPOprCJMvAopZmraEJW-a9lXmqeml-7Rp874TdPEA-YDmzXrtRWHC3KU_lTIDm22gHLC4q4IFpK7zaDUYsBtZcE2SE93cQCIrSvmnvuo0kr-YHg"/>
+<div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
+<div class="absolute bottom-md left-md right-md">
+<div class="flex gap-2 mb-2">
+<span class="px-3 py-1 rounded-full bg-secondary text-on-secondary text-[10px] font-bold uppercase">Photography</span>
+<span class="px-3 py-1 rounded-full bg-white/20 backdrop-blur-md text-white text-[10px] font-bold uppercase">Local Tip</span>
+</div>
+<h1 class="text-white font-headline-lg text-headline-lg font-bold">Best sunset spots in Gwangalli this weekend?</h1>
+</div>
+</div>
+<div class="p-md md:p-xl">
+<div class="flex items-center justify-between mb-xl border-b border-outline-variant pb-md">
+<div class="flex items-center gap-md">
+<div class="w-12 h-12 rounded-full bg-primary-container text-on-primary-container flex items-center justify-center font-bold text-lg">JK</div>
+<div>
+<div class="font-label-md text-on-surface">BusanLocal_92</div>
+<div class="text-label-sm text-on-surface-variant">Posted 2 days ago • 1,240 views</div>
+</div>
+</div>
+<div class="flex gap-base">
+<button class="flex items-center gap-1 px-4 py-2 rounded-lg border border-outline hover:bg-surface-container-low transition-colors font-label-md" onclick="switchView('write')">
+<span class="material-symbols-outlined text-sm">edit</span> Edit
+                            </button>
+<button class="flex items-center gap-1 px-4 py-2 rounded-lg text-error hover:bg-error-container/20 transition-colors font-label-md">
+<span class="material-symbols-outlined text-sm">delete</span> Delete
+                            </button>
+</div>
+</div>
+<div class="font-body-lg text-body-lg text-on-surface space-y-md leading-relaxed">
+<p>Hello fellow locals! I'm planning to head down to Gwangalli beach this Saturday to catch the sunset. I've noticed that some spots get incredibly crowded lately.</p>
+<p>Does anyone have recommendations for a slightly quieter rooftop cafe or a specific section of the beach that offers the best angle of the Diamond Bridge during the golden hour?</p>
+<p>I heard there's a new lounge opening near the North end, but I'm not sure if it's open yet. Any tips would be greatly appreciated! Thanks in advance!</p>
+</div>
+<div class="mt-xl flex items-center gap-lg border-t border-outline-variant pt-xl">
+<button class="flex items-center gap-2 text-on-surface-variant hover:text-primary transition-colors">
+<span class="material-symbols-outlined">favorite</span>
+<span class="font-label-md">42 Likes</span>
+</button>
+<button class="flex items-center gap-2 text-on-surface-variant">
+<span class="material-symbols-outlined">chat_bubble</span>
+<span class="font-label-md">12 Comments</span>
+</button>
+<button class="flex items-center gap-2 text-on-surface-variant ml-auto">
+<span class="material-symbols-outlined">share</span>
+<span class="font-label-md">Share</span>
+</button>
+</div>
+</div>
+</article>
+<!-- Comments Section -->
+<section class="space-y-md">
+<h3 class="font-headline-md text-on-surface font-bold">Comments</h3>
+<div class="bg-surface rounded-xl border border-outline-variant p-md">
+<textarea class="w-full bg-surface-container-low border-none rounded-lg p-md focus:ring-2 focus:ring-primary h-24 mb-md font-body-md" placeholder="Write a comment..."></textarea>
+<div class="flex justify-end">
+<button class="px-md py-2 bg-primary text-on-primary rounded-lg font-label-md">Post Comment</button>
+</div>
+</div>
+<div class="space-y-base">
+<div class="flex gap-md p-md bg-white rounded-xl shadow-sm border border-outline-variant/30">
+<div class="w-10 h-10 shrink-0 rounded-full bg-secondary-fixed flex items-center justify-center text-secondary font-bold">SW</div>
+<div class="flex-grow">
+<div class="flex items-center justify-between mb-1">
+<span class="font-label-md text-on-surface">SeasideWalker</span>
+<span class="text-label-sm text-on-surface-variant">1 day ago</span>
+</div>
+<p class="text-body-md text-on-surface-variant">Check out 'Blue Wave Cafe' near the Millak waterfront. It's usually less crowded than the main strip!</p>
+</div>
+</div>
+</div>
+</section>
+</div>
+<!-- WRITE/EDIT FORM VIEW -->
+<div class="hidden max-w-3xl mx-auto" id="view-write">
+<div class="bg-surface rounded-2xl border border-outline-variant shadow-xl overflow-hidden p-md md:p-xl">
+<h3 class="font-headline-md text-on-surface font-bold mb-xl">Create New Community Post</h3>
+<form class="space-y-lg">
+<div class="space-y-base">
+<label class="font-label-md text-on-surface-variant ml-1">Post Title</label>
+<input class="w-full bg-surface-container-low border-none rounded-lg py-4 px-md text-body-lg focus:ring-2 focus:ring-primary placeholder:text-outline" placeholder="Enter a descriptive title..." type="text"/>
+</div>
+<div class="space-y-base">
+<label class="font-label-md text-on-surface-variant ml-1">Category</label>
+<div class="flex flex-wrap gap-sm">
+<button class="px-4 py-2 rounded-full border border-primary text-primary font-label-md bg-primary/5" type="button">Question</button>
+<button class="px-4 py-2 rounded-full border border-outline text-on-surface-variant font-label-md" type="button">Announcement</button>
+<button class="px-4 py-2 rounded-full border border-outline text-on-surface-variant font-label-md" type="button">Local Tip</button>
+<button class="px-4 py-2 rounded-full border border-outline text-on-surface-variant font-label-md" type="button">Event</button>
+</div>
+</div>
+<div class="space-y-base">
+<label class="font-label-md text-on-surface-variant ml-1">Content</label>
+<textarea class="w-full bg-surface-container-low border-none rounded-lg p-md h-64 focus:ring-2 focus:ring-primary font-body-md" placeholder="Tell the community what's on your mind..."></textarea>
+</div>
+<div class="space-y-base">
+<label class="font-label-md text-on-surface-variant ml-1">Upload Media</label>
+<div class="border-2 border-dashed border-outline-variant rounded-2xl p-xl flex flex-col items-center justify-center gap-base bg-surface-container-lowest hover:bg-surface-container-low transition-colors cursor-pointer">
+<span class="material-symbols-outlined text-4xl text-outline">cloud_upload</span>
+<div class="text-center">
+<p class="font-label-md text-on-surface font-bold">Drop images here or click to browse</p>
+<p class="text-label-sm text-outline mt-1">PNG, JPG or WEBP (Max 10MB)</p>
+</div>
+</div>
+</div>
+<div class="flex items-center justify-end gap-md pt-md">
+<button class="px-xl py-3 rounded-lg border border-outline text-on-surface-variant hover:bg-surface-container-low transition-colors font-label-md" onclick="switchView('list')" type="button">Cancel</button>
+<button class="px-xl py-3 rounded-lg bg-primary text-on-primary hover:bg-primary-container transition-colors shadow-lg font-label-md font-bold" onclick="switchView('list')" type="button">Publish Post</button>
+</div>
+</form>
+</div>
+</div>
+</main>
+<!-- Footer -->
+<footer class="bg-surface-container border-t border-outline-variant mt-xl">
+<div class="flex flex-col gap-base items-center justify-center py-xl px-gutter w-full max-w-container-max mx-auto text-center">
+<div class="font-headline-md text-headline-md font-bold text-primary mb-4">LocalHub</div>
+<p class="font-body-md text-body-md text-secondary">© 2024 LocalHub Busan. All rights reserved.</p>
+<div class="max-w-2xl space-y-2 mt-4">
+<p class="font-label-sm text-label-sm text-on-surface-variant">이 서비스는 한국관광공사 Tour API(TourAPI 4.0)의 데이터를 활용하였습니다. 출처: 한국관광공사 (data.go.kr)</p>
+<p class="font-label-sm text-label-sm text-on-surface-variant">라이선스: 공공누리 제3유형(출처표시·변경금지)</p>
+</div>
+<div class="flex gap-lg mt-base">
+<a class="text-on-surface-variant hover:text-primary transition-colors underline font-label-sm" href="#">Privacy Policy</a>
+<a class="text-on-surface-variant hover:text-primary transition-colors underline font-label-sm" href="#">Terms of Service</a>
+<a class="text-on-surface-variant hover:text-primary transition-colors underline font-label-sm" href="#">Contact Us</a>
+</div>
+</div>
+</footer>
+<!-- FAB (Suppressed on Board Details/Forms) -->
+<button class="fixed bottom-8 right-8 w-16 h-16 bg-primary text-on-primary rounded-2xl shadow-xl flex items-center justify-center hover:scale-110 active:scale-95 transition-all z-40" id="main-fab" onclick="switchView('write')">
+<span class="material-symbols-outlined text-3xl">add</span>
+</button>
+<script>
+        function switchView(view) {
+            const list = document.getElementById('view-list');
+            const detail = document.getElementById('view-detail');
+            const write = document.getElementById('view-write');
+            const tabList = document.getElementById('tab-list');
+            const tabWrite = document.getElementById('tab-write');
+            const fab = document.getElementById('main-fab');
+
+            // Reset classes
+            [list, detail, write].forEach(el => el.classList.add('hidden'));
+            tabList.classList.remove('bg-primary', 'text-on-primary', 'shadow-sm', 'active-tab-indicator');
+            tabList.classList.add('text-on-surface-variant', 'hover:bg-surface-container-high');
+            tabWrite.classList.remove('bg-primary', 'text-on-primary', 'shadow-sm', 'active-tab-indicator');
+            tabWrite.classList.add('text-on-surface-variant', 'hover:bg-surface-container-high');
+
+            // Show appropriate view
+            if (view === 'list') {
+                list.classList.remove('hidden');
+                tabList.classList.add('bg-primary', 'text-on-primary', 'shadow-sm', 'active-tab-indicator');
+                tabList.classList.remove('text-on-surface-variant', 'hover:bg-surface-container-high');
+                fab.classList.remove('hidden');
+            } else if (view === 'detail') {
+                detail.classList.remove('hidden');
+                fab.classList.add('hidden');
+            } else if (view === 'write') {
+                write.classList.remove('hidden');
+                tabWrite.classList.add('bg-primary', 'text-on-primary', 'shadow-sm', 'active-tab-indicator');
+                tabWrite.classList.remove('text-on-surface-variant', 'hover:bg-surface-container-high');
+                fab.classList.add('hidden');
+            }
+            
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+    </script>
+</body></html>

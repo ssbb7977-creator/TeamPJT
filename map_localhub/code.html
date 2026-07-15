@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+
+<html class="light" lang="ko"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Map | LocalHub Busan</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&amp;family=Noto+Sans:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<style>
+    /* Material Symbols Configuration */
+    .material-symbols-outlined {
+      font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+    }
+    
+    /* Custom Scrollbar for side list */
+    .custom-scrollbar::-webkit-scrollbar {
+      width: 6px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-track {
+      background: transparent;
+    }
+    .custom-scrollbar::-webkit-scrollbar-thumb {
+      background-color: #c2c6d4;
+      border-radius: 20px;
+    }
+    
+    /* Subtle seagull motif animation for atmosphere */
+    @keyframes soar {
+      0%, 100% { transform: translateY(0) rotate(0deg); }
+      50% { transform: translateY(-10px) rotate(2deg); }
+    }
+    .soaring-icon {
+      animation: soar 4s ease-in-out infinite;
+    }
+
+    /* Map transition for smoother interactivity */
+    .map-card-transition {
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+  </style>
+<script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          "colors": {
+                  "on-tertiary-fixed-variant": "#504629",
+                  "secondary-fixed-dim": "#9accf3",
+                  "inverse-primary": "#a9c7ff",
+                  "on-background": "#191c1d",
+                  "secondary-container": "#a5d8ff",
+                  "on-secondary-fixed": "#001e2f",
+                  "tertiary-container": "#695e3f",
+                  "outline-variant": "#c2c6d4",
+                  "on-tertiary": "#ffffff",
+                  "on-tertiary-fixed": "#221b03",
+                  "surface": "#f8f9fa",
+                  "error": "#ba1a1a",
+                  "surface-dim": "#d9dadb",
+                  "secondary": "#2e6385",
+                  "primary-fixed": "#d6e3ff",
+                  "on-secondary": "#ffffff",
+                  "tertiary-fixed": "#f1e1b9",
+                  "outline": "#727783",
+                  "primary-container": "#005eb8",
+                  "surface-container-high": "#e7e8e9",
+                  "on-secondary-fixed-variant": "#0c4b6c",
+                  "inverse-on-surface": "#f0f1f2",
+                  "on-primary": "#ffffff",
+                  "on-tertiary-container": "#e8d8b1",
+                  "primary": "#00478d",
+                  "on-surface": "#191c1d",
+                  "on-surface-variant": "#424752",
+                  "surface-bright": "#f8f9fa",
+                  "surface-container-lowest": "#ffffff",
+                  "surface-tint": "#005db6",
+                  "surface-variant": "#e1e3e4",
+                  "secondary-fixed": "#c9e6ff",
+                  "on-error-container": "#93000a",
+                  "surface-container-highest": "#e1e3e4",
+                  "tertiary-fixed-dim": "#d4c59f",
+                  "on-primary-container": "#c8daff",
+                  "primary-fixed-dim": "#a9c7ff",
+                  "on-primary-fixed-variant": "#00468c",
+                  "surface-container-low": "#f3f4f5",
+                  "on-secondary-container": "#285f80",
+                  "background": "#f8f9fa",
+                  "on-primary-fixed": "#001b3d",
+                  "error-container": "#ffdad6",
+                  "on-error": "#ffffff",
+                  "surface-container": "#edeeef",
+                  "inverse-surface": "#2e3132",
+                  "tertiary": "#504629"
+          },
+          "borderRadius": {
+                  "DEFAULT": "0.25rem",
+                  "lg": "0.5rem",
+                  "xl": "0.75rem",
+                  "full": "9999px"
+          },
+          "spacing": {
+                  "xs": "4px",
+                  "lg": "40px",
+                  "base": "8px",
+                  "xl": "64px",
+                  "md": "24px",
+                  "gutter": "24px",
+                  "margin-mobile": "16px",
+                  "container-max": "1280px",
+                  "sm": "12px"
+          },
+          "fontFamily": {
+                  "display-lg": ["Be Vietnam Pro"],
+                  "body-lg": ["Noto Sans"],
+                  "headline-lg": ["Be Vietnam Pro"],
+                  "headline-lg-mobile": ["Be Vietnam Pro"],
+                  "headline-md": ["Be Vietnam Pro"],
+                  "body-md": ["Noto Sans"],
+                  "label-md": ["Noto Sans"],
+                  "label-sm": ["Noto Sans"]
+          },
+          "fontSize": {
+                  "display-lg": ["48px", {"lineHeight": "1.2", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                  "body-lg": ["18px", {"lineHeight": "1.6", "fontWeight": "400"}],
+                  "headline-lg": ["32px", {"lineHeight": "1.3", "fontWeight": "600"}],
+                  "headline-lg-mobile": ["24px", {"lineHeight": "1.3", "fontWeight": "600"}],
+                  "headline-md": ["24px", {"lineHeight": "1.4", "fontWeight": "600"}],
+                  "body-md": ["16px", {"lineHeight": "1.6", "fontWeight": "400"}],
+                  "label-md": ["14px", {"lineHeight": "1.4", "letterSpacing": "0.01em", "fontWeight": "500"}],
+                  "label-sm": ["12px", {"lineHeight": "1.2", "fontWeight": "600"}]
+          }
+        },
+      },
+    }
+  </script>
+</head>
+<body class="bg-surface text-on-surface font-body-md selection:bg-secondary-container selection:text-on-secondary-container">
+<!-- TopNavBar (Shared Component) -->
+<nav class="sticky top-0 z-50 bg-surface dark:bg-background shadow-sm border-b border-outline-variant dark:border-outline">
+<div class="flex justify-between items-center px-gutter py-4 w-full max-w-container-max mx-auto">
+<div class="font-headline-md text-headline-md font-bold text-primary dark:text-primary-fixed flex items-center gap-2">
+<span class="material-symbols-outlined text-3xl" style="font-variation-settings: 'FILL' 1;">sailing</span>
+        LocalHub
+      </div>
+<div class="hidden md:flex items-center gap-8">
+<a class="text-on-surface-variant dark:text-on-secondary-fixed-variant hover:text-primary dark:hover:text-primary-fixed transition-colors font-label-md text-label-md" href="#">Home</a>
+<a class="text-primary dark:text-primary-fixed border-b-2 border-primary dark:border-primary-fixed font-bold pb-1 font-label-md text-label-md" href="#">Map</a>
+<a class="text-on-surface-variant dark:text-on-secondary-fixed-variant hover:text-primary dark:hover:text-primary-fixed transition-colors font-label-md text-label-md" href="#">Board</a>
+</div>
+<div class="flex items-center gap-4">
+<button class="p-2 hover:bg-surface-container-low dark:hover:bg-on-secondary-fixed-variant/10 rounded-lg transition-colors active:scale-95">
+<span class="material-symbols-outlined text-on-surface-variant">search</span>
+</button>
+<button class="flex items-center gap-2 p-1 pl-3 pr-2 hover:bg-surface-container-low dark:hover:bg-on-secondary-fixed-variant/10 rounded-full transition-colors active:scale-95 border border-outline-variant">
+<span class="font-label-md text-label-md text-on-surface">Guest</span>
+<span class="material-symbols-outlined text-primary" style="font-variation-settings: 'FILL' 1;">account_circle</span>
+</button>
+</div>
+</div>
+</nav>
+<main class="max-w-container-max mx-auto px-gutter py-base md:py-md">
+<!-- Header & Categories -->
+<header class="mb-gutter space-y-md">
+<div class="flex items-end justify-between">
+<div>
+<h1 class="font-headline-lg text-headline-lg md:text-headline-lg text-primary mb-1">Local Explorer</h1>
+<p class="font-body-md text-body-md text-on-surface-variant">Explore cultural landmarks and local hotspots in Busan.</p>
+</div>
+<div class="hidden md:block">
+<div class="bg-tertiary-fixed text-on-tertiary-fixed px-4 py-2 rounded-lg flex items-center gap-2 shadow-sm border border-outline-variant/30">
+<span class="material-symbols-outlined text-on-tertiary-fixed-variant soaring-icon">location_on</span>
+<span class="font-label-md text-label-md">Busan, South Korea</span>
+</div>
+</div>
+</div>
+<!-- Filter Pills -->
+<div class="flex flex-wrap items-center gap-2 overflow-x-auto pb-2 scrollbar-hide">
+<button class="bg-primary text-on-primary px-5 py-2 rounded-full font-label-md text-label-md shadow-md active:scale-95 transition-all">전체</button>
+<button class="bg-secondary-container text-on-secondary-container px-5 py-2 rounded-full font-label-md text-label-md hover:bg-primary-container hover:text-on-primary-container active:scale-95 transition-all">관광지</button>
+<button class="bg-primary-container text-on-primary-container px-5 py-2 rounded-full font-label-md text-label-md ring-2 ring-primary ring-offset-2 active:scale-95 transition-all flex items-center gap-2">
+<span class="material-symbols-outlined text-sm" style="font-variation-settings: 'FILL' 1;">theater_comedy</span>
+          문화시설
+        </button>
+<button class="bg-secondary-container text-on-secondary-container px-5 py-2 rounded-full font-label-md text-label-md hover:bg-primary-container hover:text-on-primary-container active:scale-95 transition-all">축제</button>
+<button class="bg-secondary-container text-on-secondary-container px-5 py-2 rounded-full font-label-md text-label-md hover:bg-primary-container hover:text-on-primary-container active:scale-95 transition-all">레포츠</button>
+<button class="bg-secondary-container text-on-secondary-container px-5 py-2 rounded-full font-label-md text-label-md hover:bg-primary-container hover:text-on-primary-container active:scale-95 transition-all">숙박</button>
+<button class="bg-secondary-container text-on-secondary-container px-5 py-2 rounded-full font-label-md text-label-md hover:bg-primary-container hover:text-on-primary-container active:scale-95 transition-all">쇼핑</button>
+</div>
+<div class="flex items-center gap-2 px-2 py-1 bg-surface-container-low rounded-lg w-fit">
+<span class="font-label-sm text-label-sm text-on-surface-variant">선택 카테고리:</span>
+<span class="font-label-md text-label-md font-bold text-primary">culture</span>
+<span class="text-outline mx-1">—</span>
+<span class="font-label-sm text-label-sm text-on-surface-variant">총 123개 검색됨</span>
+</div>
+</header>
+<!-- Main Map/List Layout -->
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-gutter h-[calc(100vh-320px)] min-h-[500px]">
+<!-- Interactive Map Area -->
+<div class="lg:col-span-8 relative overflow-hidden rounded-xl bg-white shadow-md border border-outline-variant group">
+<!-- Interactive Map Container -->
+<div class="absolute inset-0 z-0 bg-[#E0F2F1]">
+<!-- Placeholder Map Background -->
+<div class="w-full h-full bg-cover bg-center grayscale-[0.2] opacity-80 transition-transform duration-700 group-hover:scale-105" data-location="Busan South Korea" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuBZCrJsKwuROpHN7VElMCz9MUl72YfizzUgfSBXLzNqdQitWxIrdn36K712sZ_qJeNBvEF4R0BUrLjC-yqNnppB01R7Nj_d1dpjlm9dW65B1FVdCuJSNE2Wr85x-lTRUmN9BYPWw8iGWZWU_VgDwsBwQSv7_Eh3qsaZhxcHeklMYst_QVoyabnxvfXr1exQjhxQYdUESLXsY1VCvTPFtyBUH8LW0bm7xF-q5bzi8KS1_xuR6IpQGzRkh7nUqFUUmgp5F49A4dvLlQ')"></div>
+<!-- Custom Map Overlays (Markers) -->
+<div class="absolute inset-0 pointer-events-none">
+<!-- Example Markers -->
+<div class="absolute top-[20%] left-[30%] pointer-events-auto cursor-pointer flex flex-col items-center group/marker">
+<div class="bg-primary text-white p-2 rounded-full shadow-lg transform transition-transform group-hover/marker:scale-110">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">location_on</span>
+</div>
+<div class="mt-1 bg-white px-2 py-1 rounded shadow-sm text-xs font-bold opacity-0 group-hover/marker:opacity-100 transition-opacity whitespace-nowrap">국립부산과학관</div>
+</div>
+<div class="absolute top-[45%] left-[65%] pointer-events-auto cursor-pointer flex flex-col items-center group/marker">
+<div class="bg-error text-white p-2 rounded-full shadow-lg transform transition-transform group-hover/marker:scale-110 ring-4 ring-error/20">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">favorite</span>
+</div>
+<div class="mt-1 bg-white px-2 py-1 rounded shadow-sm text-xs font-bold opacity-0 group-hover/marker:opacity-100 transition-opacity whitespace-nowrap">임시수도기념관</div>
+</div>
+<div class="absolute bottom-[30%] left-[40%] pointer-events-auto cursor-pointer flex flex-col items-center group/marker">
+<div class="bg-primary text-white p-2 rounded-full shadow-lg transform transition-transform group-hover/marker:scale-110">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">location_on</span>
+</div>
+<div class="mt-1 bg-white px-2 py-1 rounded shadow-sm text-xs font-bold opacity-0 group-hover/marker:opacity-100 transition-opacity whitespace-nowrap">동아대학교 박물관</div>
+</div>
+</div>
+<!-- Map Controls -->
+<div class="absolute bottom-4 right-4 flex flex-col gap-2 pointer-events-auto">
+<button class="w-10 h-10 bg-white rounded-lg shadow-md border border-outline-variant flex items-center justify-center hover:bg-surface-container transition-colors">
+<span class="material-symbols-outlined">add</span>
+</button>
+<button class="w-10 h-10 bg-white rounded-lg shadow-md border border-outline-variant flex items-center justify-center hover:bg-surface-container transition-colors">
+<span class="material-symbols-outlined">remove</span>
+</button>
+<button class="w-10 h-10 bg-white rounded-lg shadow-md border border-outline-variant flex items-center justify-center hover:bg-surface-container transition-colors text-primary">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">my_location</span>
+</button>
+</div>
+<!-- Attribution -->
+<div class="absolute bottom-1 left-2 pointer-events-none">
+<p class="text-[10px] text-on-surface-variant/70">© OpenStreetMap contributors, TourAPI 4.0</p>
+</div>
+</div>
+</div>
+<!-- Sidebar List -->
+<div class="lg:col-span-4 flex flex-col gap-base h-full">
+<div class="flex items-center justify-between px-2">
+<h2 class="font-headline-md text-headline-md text-on-surface">추천 장소</h2>
+<button class="text-primary font-label-md text-label-md flex items-center gap-1 hover:underline">
+<span class="material-symbols-outlined text-sm">sort</span>
+            거리순
+          </button>
+</div>
+<div class="flex-1 overflow-y-auto custom-scrollbar pr-2 space-y-4">
+<!-- Location Card 1 -->
+<div class="bg-white rounded-xl p-3 shadow-md border border-outline-variant hover:border-primary/50 transition-all cursor-pointer group/card active:scale-[0.98]">
+<div class="flex gap-4">
+<div class="w-24 h-24 rounded-lg overflow-hidden flex-shrink-0">
+<img class="w-full h-full object-cover group-hover/card:scale-110 transition-transform duration-500" data-alt="A cinematic architectural photo of the Busan Provisional Capital Memorial Hall, a beautiful red-brick building with dark tiled roofs, set against a backdrop of lush greenery and soft, warm afternoon sunlight. The image captures the historical significance and elegant design of the structure within its serene coastal city environment. Modern light mode aesthetic." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCuFRGfOPJGNeiUPunWfMGkHmFDgHLqCx4hDDI6CsxYf7mBt4BCCAbUiNtUBpUGLpjzQehMttWhWnwX1sBmpoRX50OBToxzCiY9ed2FhIuh9Gz_3E7xAhEP5i1BjkfE3Fn1X7Gcfh7bHipnB3R7-UY_2Xx1t4MPFMcPiwIZQYISOOWa5adREr5-kznMjL-BuOGCVqvv3fsMZ-WxIznd7D97rNfuNO0bLsemwmgWAxWAma3qnQr6D4Jjmgf1DjVUlZ40LUhIXPu6Aw"/>
+</div>
+<div class="flex-1 min-w-0">
+<div class="flex items-start justify-between">
+<h3 class="font-label-md text-label-md font-bold text-on-surface truncate pr-2">임시수도기념관</h3>
+<span class="material-symbols-outlined text-error text-lg" style="font-variation-settings: 'FILL' 1;">favorite</span>
+</div>
+<p class="text-on-surface-variant font-label-sm text-label-sm mt-1 line-clamp-2">부산광역시 서구 임시수도기념로 45 (부민동3가)</p>
+<div class="mt-3 flex items-center gap-2">
+<span class="bg-secondary-container text-on-secondary-container text-[10px] px-2 py-0.5 rounded-full font-bold">HISTORIC</span>
+<span class="text-primary font-label-sm text-label-sm flex items-center gap-0.5">
+<span class="material-symbols-outlined text-xs">navigation</span>
+                    2.4km
+                  </span>
+</div>
+</div>
+</div>
+</div>
+<!-- Location Card 2 -->
+<div class="bg-white rounded-xl p-3 shadow-md border border-outline-variant hover:border-primary/50 transition-all cursor-pointer group/card active:scale-[0.98]">
+<div class="flex gap-4">
+<div class="w-24 h-24 rounded-lg overflow-hidden flex-shrink-0">
+<img class="w-full h-full object-cover group-hover/card:scale-110 transition-transform duration-500" data-alt="The grand facade of the Dong-A University Museum in Busan, showcasing its monumental classical architecture with tall columns and intricate stone carvings. The sky is a clear, vibrant coastal blue, and the building is bathed in bright, natural light that emphasizes its texture and cultural importance. Crisp, clean modern corporate photography style." src="https://lh3.googleusercontent.com/aida-public/AB6AXuC0INdTUJvY1oD4sSySdTzo2byEHAjd0s3hK1ntSrSsE2Mi4yncjAginwXH3PwjqeQa4A4QAi8TGQX2EFP1d_MEt24xCE6oRQG7dV5lEaZrECmQpL6jgxSoHr5n0ZRMGNhYIpJVMTMEbZ8J4VrLGWegNex51qh83taDjUj062G-6TAXHEVSIJqFeXO_C4qq7Zwiq_CR6FGK0Fe7j_SvI45Meay2YDgxMDjVRlCXmYdqR1qmBYybWDRhXtNI3AUFBrhFWyOrB-r9uA"/>
+</div>
+<div class="flex-1 min-w-0">
+<div class="flex items-start justify-between">
+<h3 class="font-label-md text-label-md font-bold text-on-surface truncate pr-2">동아대학교 석당박물관</h3>
+<span class="material-symbols-outlined text-outline text-lg">favorite</span>
+</div>
+<p class="text-on-surface-variant font-label-sm text-label-sm mt-1 line-clamp-2">부산광역시 서구 구덕로 225</p>
+<div class="mt-3 flex items-center gap-2">
+<span class="bg-secondary-container text-on-secondary-container text-[10px] px-2 py-0.5 rounded-full font-bold">MUSEUM</span>
+<span class="text-primary font-label-sm text-label-sm flex items-center gap-0.5">
+<span class="material-symbols-outlined text-xs">navigation</span>
+                    3.1km
+                  </span>
+</div>
+</div>
+</div>
+</div>
+<!-- Location Card 3 -->
+<div class="bg-white rounded-xl p-3 shadow-md border border-outline-variant hover:border-primary/50 transition-all cursor-pointer group/card active:scale-[0.98]">
+<div class="flex gap-4">
+<div class="w-24 h-24 rounded-lg overflow-hidden flex-shrink-0">
+<img class="w-full h-full object-cover group-hover/card:scale-110 transition-transform duration-500" data-alt="A lush entrance to Domoheon in Busan, featuring traditional stone walls and vibrant garden landscaping with native flowers and shrubs. The scene is peaceful and inviting, captured with a soft-focus background that highlights the detailed stone textures and the refreshing green foliage. Warm, reliable, and deeply local atmosphere." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBYuGyw9ZSa9LwaetPsusMTx3mApO2WkEFNRLTnot3faXZ89pgAjURmYN67O5qQkwX_gYtQJml-UmhzAESg7Rb5F2VLVt1D70I028HuMIUD-sWA6gKrccXVlmhRdAwNeja6BnzAl3AdLBwgY21C0T3rrg1kXYoagzGEk7QhFC-__7vU8tGGbufixx-tVriA7HA0oUT2ngfcDY5JgctBzHUbeCYPo1WUhug3wq92llEq6W8cyhqjbR3NVqbsxIf2jYtZRYeewI7IyQ"/>
+</div>
+<div class="flex-1 min-w-0">
+<div class="flex items-start justify-between">
+<h3 class="font-label-md text-label-md font-bold text-on-surface truncate pr-2">도모헌</h3>
+<span class="material-symbols-outlined text-outline text-lg">favorite</span>
+</div>
+<p class="text-on-surface-variant font-label-sm text-label-sm mt-1 line-clamp-2">부산광역시 수영구 황령산로7번길 60 (남천동)</p>
+<div class="mt-3 flex items-center gap-2">
+<span class="bg-secondary-container text-on-secondary-container text-[10px] px-2 py-0.5 rounded-full font-bold">CULTURAL</span>
+<span class="text-primary font-label-sm text-label-sm flex items-center gap-0.5">
+<span class="material-symbols-outlined text-xs">navigation</span>
+                    5.8km
+                  </span>
+</div>
+</div>
+</div>
+</div>
+<!-- Location Card 4 -->
+<div class="bg-white rounded-xl p-3 shadow-md border border-outline-variant hover:border-primary/50 transition-all cursor-pointer group/card active:scale-[0.98]">
+<div class="flex gap-4">
+<div class="w-24 h-24 rounded-lg overflow-hidden flex-shrink-0">
+<img class="w-full h-full object-cover group-hover/card:scale-110 transition-transform duration-500" data-alt="The futuristic glass and steel architecture of the Busan National Science Museum, reflecting the bright sky and surrounding landscape. The building's sharp angles and large transparent panels create a sense of technological advancement and curiosity. The lighting is high-key and optimistic, perfect for a modern science and education hub." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDMWhwEu71Z7CFUMYuuJg0SZiv0jiPTHgONHyjxAkS7AsIkCBpRyKJAfbsl81s48Bz72mRAiS70FrY6fkU3m7bDbnDanSLolHY6hYIEaWMJRNhJeeiCfORWaibv1l5qwZWjFE2NuhfAuipzKckPKY6S9faAnws_TSq965yrBj79BEKInJBRJzm7IZMEWdbCCuqdOd02h3TwwuW2XqJVkO0CAaHuiKLGdmE4hCI5_6rEIUUGNC6xMCLr7ShyH3eM-t7vviIa7l_wFQ"/>
+</div>
+<div class="flex-1 min-w-0">
+<div class="flex items-start justify-between">
+<h3 class="font-label-md text-label-md font-bold text-on-surface truncate pr-2">국립부산과학관</h3>
+<span class="material-symbols-outlined text-outline text-lg">favorite</span>
+</div>
+<p class="text-on-surface-variant font-label-sm text-label-sm mt-1 line-clamp-2">부산광역시 기장군 기장읍 동부산관광6로 59</p>
+<div class="mt-3 flex items-center gap-2">
+<span class="bg-secondary-container text-on-secondary-container text-[10px] px-2 py-0.5 rounded-full font-bold">SCIENCE</span>
+<span class="text-primary font-label-sm text-label-sm flex items-center gap-0.5">
+<span class="material-symbols-outlined text-xs">navigation</span>
+                    14.2km
+                  </span>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</main>
+<!-- Footer (Shared Component) -->
+<footer class="bg-surface-container dark:bg-surface-dim border-t border-outline-variant dark:border-outline mt-xl">
+<div class="flex flex-col gap-base items-center justify-center py-xl px-gutter w-full max-w-container-max mx-auto text-center">
+<div class="font-headline-md text-headline-md font-bold text-primary dark:text-primary-fixed mb-2">LocalHub</div>
+<div class="max-w-2xl">
+<p class="font-body-md text-body-md text-secondary dark:text-secondary-fixed-dim">
+          이 서비스는 한국관광공사 Tour API(TourAPI 4.0)의 데이터를 활용하였습니다. 출처: 한국관광공사 (data.go.kr)
+        </p>
+<p class="font-label-sm text-label-sm text-on-surface-variant dark:text-outline mt-2">
+          라이선스: 공공누리 제3유형(출처표시·변경금지)
+        </p>
+</div>
+<div class="flex flex-wrap justify-center gap-6 mt-4">
+<a class="text-on-surface-variant dark:text-outline hover:text-primary dark:hover:text-primary-fixed transition-colors underline font-label-sm text-label-sm" href="#">개인정보처리방침</a>
+<a class="text-on-surface-variant dark:text-outline hover:text-primary dark:hover:text-primary-fixed transition-colors underline font-label-sm text-label-sm" href="#">이용약관</a>
+<a class="text-on-surface-variant dark:text-outline hover:text-primary dark:hover:text-primary-fixed transition-colors underline font-label-sm text-label-sm" href="#">문의하기</a>
+</div>
+<div class="mt-8 font-label-sm text-label-sm text-on-surface-variant dark:text-outline opacity-60">
+        © 2024 LocalHub Busan. All rights reserved.
+      </div>
+</div>
+</footer>
+<!-- Floating Chat Button (Contextual) -->
+<button class="fixed bottom-6 right-6 z-50 bg-primary text-on-primary w-14 h-14 rounded-full shadow-lg flex items-center justify-center hover:scale-110 active:scale-95 transition-all">
+<span class="material-symbols-outlined text-2xl">chat_bubble</span>
+</button>
+<script>
+    // Micro-interaction for list items and map integration
+    document.querySelectorAll('.group\\/card').forEach(card => {
+      card.addEventListener('mouseenter', () => {
+        // Here we would typically pan the map or highlight markers
+      });
+    });
+
+    // Simple interaction for category pills
+    const pills = document.querySelectorAll('.rounded-full');
+    pills.forEach(pill => {
+      pill.addEventListener('click', function() {
+        pills.forEach(p => {
+          if(!p.classList.contains('active-pill')) {
+            p.classList.remove('bg-primary', 'text-on-primary', 'shadow-md', 'ring-2', 'ring-primary', 'ring-offset-2');
+            p.classList.add('bg-secondary-container', 'text-on-secondary-container');
+          }
+        });
+        this.classList.add('bg-primary', 'text-on-primary', 'shadow-md');
+        this.classList.remove('bg-secondary-container', 'text-on-secondary-container');
+      });
+    });
+  </script>
+</body></html>

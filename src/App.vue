@@ -1,25 +1,17 @@
 <template>
-  <div id="app">
-    <Header />
-    <main>
-      <router-view />
-    </main>
-    <Footer />
-    <ChatBotFloating />
-  </div>
+  <AppLayout>
+    <router-view />
+  </AppLayout>
 </template>
 
 <script>
-import Header from './components/Header.vue'
-import Footer from './components/Footer.vue'
-import ChatBotFloating from './components/ChatBotFloating.vue'
+import AppLayout from './components/AppLayout.vue'
 
 export default {
-  components: { Header, Footer, ChatBotFloating }
+  components: { AppLayout }
 }
 </script>
 
 <style>
-#app { font-family: Avenir, Helvetica, Arial, sans-serif; }
-main { padding: 16px; min-height: calc(100vh - 140px); }
+/* Root styles handled in assets/styles.css and layout component */
 </style>
