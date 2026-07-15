@@ -11,7 +11,10 @@
 
         <div>
           <label class="block text-sm font-medium mb-2">카테고리</label>
-          <input v-model="category" placeholder="예: 추천, 맛집, 축제" class="w-full border border-slate-200 rounded-md px-3 py-2" />
+          <select v-model="category" class="w-64 border border-slate-200 rounded-md px-3 py-2">
+            <option value="">선택하세요</option>
+            <option v-for="c in categories" :key="c" :value="c">{{ c }}</option>
+          </select>
         </div>
 
         <div>
@@ -39,7 +42,7 @@ import { addPost, seedExample } from '../utils/posts'
 export default {
   name: 'BoardWrite',
   data() {
-    return { title: '', content: '', password: '', category: '' }
+    return { title: '', content: '', password: '', category: '', categories: ['추천','맛집','축제','레포츠','숙박','쇼핑'] }
   },
   mounted() {
     // seed examples on first load
