@@ -5,10 +5,12 @@ import Board from '../views/Board.vue'
 import BoardDetail from '../views/BoardDetail.vue'
 import BoardWrite from '../views/BoardWrite.vue'
 import NotFound from '../views/NotFound.vue'
+import Calender from '../views/Calender.vue'
 
 const routes = [
   { path: '/', name: 'Home', component: Home },
   { path: '/map', name: 'Map', component: MapView },
+  { path: '/calender', name: 'Calender', component: Calender },
   { path: '/board', name: 'Board', component: Board },
   { path: '/board/write', name: 'BoardWrite', component: BoardWrite },
   { path: '/board/:id', name: 'BoardDetail', component: BoardDetail },
