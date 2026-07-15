@@ -14,6 +14,10 @@
           <h2>추천 관광지 미리보기</h2>
           <RecommendedPlaces />
         </section>
+
+        <div class="mt-4">
+          <FestivalList />
+        </div>
       </div>
 
       <aside class="right">
@@ -29,8 +33,9 @@
 import RecentPosts from '../components/RecentPosts.vue'
 import WeatherWidget from '../components/WeatherWidget.vue'
 import RecommendedPlaces from '../components/RecommendedPlaces.vue'
+import FestivalList from '../components/FestivalList.vue'
 
-export default { components: { RecentPosts, WeatherWidget, RecommendedPlaces } }
+export default { components: { RecentPosts, WeatherWidget, RecommendedPlaces, FestivalList } }
 </script>
 
 <style scoped>

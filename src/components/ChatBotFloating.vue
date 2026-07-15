@@ -1,6 +1,6 @@
 <template>
   <div class="chatbot-floating" @keydown.esc="close">
-    <button class="fab" @click="toggle" :aria-expanded="open" aria-label="챗봇 열기">
+    <button v-if="!open" class="fab" @click="toggle" :aria-expanded="open" aria-label="챗봇 열기">
       <img :src="iconUrl" alt="chatbot" class="fab-img" />
     </button>
 
@@ -19,7 +19,7 @@
         </div>
 
         <form class="composer" @submit.prevent="handleSend">
-          <input v-model="input" placeholder="메시지를 입력하세요..." aria-label="메시지" />
+          <input ref="inputEl" v-model="input" placeholder="메시지를 입력하세요..." aria-label="메시지" />
           <button type="submit" class="send">전송</button>
         </form>
       </div>
@@ -38,6 +38,7 @@ export default {
   },
   methods: {
     toggle() { this.open = !this.open; this.$nextTick(()=> this.scrollBottom()) },
+    toggle() { this.open = !this.open; this.$nextTick(()=>{ this.scrollBottom(); if(this.open && this.$refs.inputEl) this.$refs.inputEl.focus(); }) },
     close() { this.open = false },
     save() { try { localStorage.setItem(STORAGE_KEY, JSON.stringify(this.messages)) } catch(e){} },
     scrollBottom() { const el = this.$refs.msgList; if (el) el.scrollTop = el.scrollHeight },
