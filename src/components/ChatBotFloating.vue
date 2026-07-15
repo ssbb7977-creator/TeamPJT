@@ -1,7 +1,7 @@
 <template>
   <div class="chatbot-floating" @keydown.esc="close">
     <button class="fab" @click="toggle" :aria-expanded="open" aria-label="챗봇 열기">
-      <span class="material-symbols-outlined">chat_bubble</span>
+      <img :src="iconUrl" alt="chatbot" class="fab-img" />
     </button>
 
     <transition name="fade">
@@ -31,7 +31,7 @@
 const STORAGE_KEY = 'localhub_chat_history_v1'
 export default {
   data() {
-    return { open: false, messages: [], input: '' }
+    return { open: false, messages: [], input: '', iconUrl: 'https://img.magnific.com/free-vector/chatbot-chat-message-vectorart_78370-4104.jpg?semt=ais_hybrid&w=740&q=80' }
   },
   mounted() {
     try { const raw = localStorage.getItem(STORAGE_KEY); if (raw) this.messages = JSON.parse(raw) } catch(e){}
@@ -63,6 +63,7 @@ export default {
 <style scoped>
 .chatbot-floating { position: fixed; right: 18px; bottom: 18px; z-index:60 }
 .fab { width:56px; height:56px; border-radius:9999px; background:#00478d; color:#fff; display:flex; align-items:center; justify-content:center; box-shadow:0 6px 18px rgba(0,0,0,0.12); border:0 }
+.fab-img { width:100%; height:100%; object-fit:cover; border-radius:9999px }
 .chatbox { width:320px; height:420px; background:#fff; border-radius:12px; box-shadow:0 10px 30px rgba(0,0,0,0.12); overflow:hidden; display:flex; flex-direction:column }
 .chat-header { display:flex; justify-content:space-between; align-items:center; padding:10px 12px; background:#00478d; color:#fff; font-weight:600 }
 .chat-header .close { background:transparent; border:0; color:#fff; font-size:16px }
