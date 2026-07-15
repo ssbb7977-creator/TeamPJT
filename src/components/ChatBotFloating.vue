@@ -17,10 +17,11 @@
             <div class="ts">{{ new Date(m.ts).toLocaleTimeString() }}</div>
           </div>
         </div>
+        <div v-if="error" class="chat-error">{{ error }}</div>
 
         <form class="composer" @submit.prevent="handleSend">
-          <input ref="inputEl" v-model="input" placeholder="메시지를 입력하세요..." aria-label="메시지" />
-          <button type="submit" class="send">전송</button>
+          <input ref="inputEl" v-model="input" placeholder="메시지를 입력하세요..." aria-label="메시지" :disabled="loading" />
+          <button type="submit" class="send" :disabled="loading">{{ loading ? '전송 중...' : '전송' }}</button>
         </form>
       </div>
     </transition>

@@ -56,7 +56,8 @@ export const useChatStore = defineStore('chat', {
         this.saveToStorage()
       } catch (e) {
         console.error('sendMessage error', e)
-        this.error = '잠시 후 다시 시도해주세요.'
+        // surface actual error message to assist debugging; user-facing UI can show generic text later
+        this.error = e && e.message ? e.message : '잠시 후 다시 시도해주세요.'
       } finally {
         this.loading = false
       }
