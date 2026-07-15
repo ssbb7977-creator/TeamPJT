@@ -1,4 +1,19 @@
+const CACHE_KEY = 'localhub_weather_v1'
+const CACHE_EXPIRE = 1000 * 60 * 30 // 30 minutes
+
 export async function getBusanCurrentWeather() {
+  try {
+    const raw = localStorage.getItem(CACHE_KEY)
+    if (raw) {
+      const parsed = JSON.parse(raw)
+      if (parsed && parsed.time && (Date.now() - parsed.time) < CACHE_EXPIRE) {
+        return parsed.data
+      }
+    }
+  } catch (e) {
+    // ignore cache errors
+  }
+
   const url = 'https://api.open-meteo.com/v1/forecast?latitude=35.1796&longitude=129.0756&current_weather=true&daily=temperature_2m_max,temperature_2m_min&timezone=Asia/Seoul';
   const res = await fetch(url);
   if (!res.ok) throw new Error('Failed to fetch weather');
@@ -8,7 +23,14 @@ export async function getBusanCurrentWeather() {
   const high = json.daily && json.daily.temperature_2m_max ? json.daily.temperature_2m_max[0] : null;
   const low = json.daily && json.daily.temperature_2m_min ? json.daily.temperature_2m_min[0] : null;
 
-  return { current, high, low };
+  const data = { current, high, low };
+  try {
+    localStorage.setItem(CACHE_KEY, JSON.stringify({ time: Date.now(), data }))
+  } catch (e) {
+    // ignore storage errors
+  }
+
+  return data;
 }
 
 export function mapWeatherCode(code) {
