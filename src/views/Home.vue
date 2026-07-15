@@ -1,7 +1,6 @@
 <template>
   <div class="home-page">
-    <h1>Home</h1>
-    <p>부산 소개, 날씨, 축제, 추천 관광지, 최근 게시글 등을 배치합니다.</p>
+    <HeroBanner />
 
     <div class="home-grid">
       <div class="left">
@@ -34,8 +33,9 @@ import RecentPosts from '../components/RecentPosts.vue'
 import WeatherWidget from '../components/WeatherWidget.vue'
 import RecommendedPlaces from '../components/RecommendedPlaces.vue'
 import FestivalList from '../components/FestivalList.vue'
+import HeroBanner from '../components/HeroBanner.vue'
 
-export default { components: { RecentPosts, WeatherWidget, RecommendedPlaces, FestivalList } }
+export default { components: { RecentPosts, WeatherWidget, RecommendedPlaces, FestivalList, HeroBanner } }
 </script>
 
 <style scoped>
