@@ -17,7 +17,7 @@
       </div>
         <div class="hidden md:block">
           <div class="bg-white/10 backdrop-blur rounded-xl p-4 border border-white/20">
-            <WeatherWidget />
+            <WeatherWidget variant="hero" />
           </div>
         </div>
     </div>

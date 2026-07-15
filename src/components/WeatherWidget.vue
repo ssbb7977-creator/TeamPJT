@@ -1,5 +1,5 @@
 <template>
-  <section class="weather-widget">
+  <section :class="['weather-widget', variant==='hero' ? 'weather-hero' : '']">
     <h2>오늘의 날씨</h2>
     <div class="row">
       <div class="date">{{ data.date }}</div>
@@ -14,6 +14,7 @@ import data from '../data/weather_today.json'
 
 export default {
   name: 'WeatherWidget',
+  props: { variant: { type: String, default: '' } },
   data() { return { data } }
 }
 </script>
@@ -24,4 +25,8 @@ export default {
 .date { font-weight:600 }
 .summary { font-size:14px; color:#007acc }
 .temps { margin-top:8px; color:#666 }
+
+.weather-hero { background: rgba(255,255,255,0.12); border: 1px solid rgba(255,255,255,0.18); backdrop-filter: blur(6px); color: #fff }
+.weather-hero .summary { color: rgba(255,255,255,0.9) }
+.weather-hero .temps { color: rgba(255,255,255,0.85) }
 </style>
