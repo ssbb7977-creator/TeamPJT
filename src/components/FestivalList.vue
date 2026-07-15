@@ -8,6 +8,9 @@
         </div>
       </li>
     </ul>
+  </section>
+</template>
+
 <script>
 import { loadPlaces } from '../apis/busanData'
 import PlaceCard from './PlaceCard.vue'
