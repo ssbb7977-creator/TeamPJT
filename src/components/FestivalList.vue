@@ -5,11 +5,13 @@
       <li v-for="p in places.slice(0,5)" :key="p.contentid || p.title">
         <PlaceCard :place="{ title: p.title, addr1: p.addr1, firstimage: p.firstimage }" />
       </li>
-    </ul>
-    <router-link to="/map" class="mt-3 inline-block text-primary">더보기</router-link>
-  </section>
-</template>
-
+    <ul>
+        <li v-for="p in places.slice(0,5)" :key="p.contentid || p.title">
+          <div @click="gotoMap(p)" class="cursor-pointer">
+            <PlaceCard :place="{ title: p.title, addr1: p.addr1, firstimage: p.firstimage }" />
+          </div>
+        </li>
+      </ul>
 <script>
 import { loadPlaces } from '../apis/busanData'
 import PlaceCard from './PlaceCard.vue'
@@ -21,6 +23,13 @@ export default {
   async mounted(){
     const data = await loadPlaces('festival')
     this.places = Array.isArray(data) ? data : []
+  }
+  ,
+  methods: {
+    gotoMap(p) {
+      const key = p.contentid || p.id || p.title
+      this.$router.push({ path: '/map', query: { focus: key, category: 'festival' } })
+    }
   }
 }
 </script>

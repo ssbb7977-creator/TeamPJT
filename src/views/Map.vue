@@ -103,7 +103,8 @@ export default {
       map: null,
       markerLayer: null,
       mapCentered: false,
-      markers: {}
+      markers: {},
+      pendingFocusKey: null
     }
   },
   computed: {
@@ -116,6 +117,18 @@ export default {
   mounted() {
     console.log('[Map] mounted')
     this.load('all')
+    // if route has focus query on initial load
+    const q = this.$route && this.$route.query ? this.$route.query : {}
+    if (q && q.focus) {
+      this.pendingFocusKey = q.focus
+      const cat = q.category || this.selectedCategory
+      this.onCategoryChange(cat)
+    }
+  },
+  watch: {
+    '$route.query'(q) {
+      this.handleRouteQuery(q)
+    }
   },
   beforeUnmount() {
     if (this.map) this.map.remove()
@@ -148,6 +161,14 @@ export default {
     selectCategory(val) {
       // invoked by UI pills
       this.onCategoryChange(val)
+    },
+    // handle route query changes
+    handleRouteQuery(q) {
+      if (q && q.focus) {
+        this.pendingFocusKey = q.focus
+        const cat = q.category || this.selectedCategory
+        this.onCategoryChange(cat)
+      }
     },
     focusPlace(place) {
       if (!place) return
@@ -200,6 +221,20 @@ export default {
         }
       }
       console.log('[Map] rendered markers, count=', items.length)
+      // if there's a pending focus request from route or elsewhere, focus now
+      if (this.pendingFocusKey) {
+        const key = this.pendingFocusKey
+        const marker = this.markers[key]
+        if (marker) {
+          try {
+            this.map.flyTo(marker.getLatLng(), 15)
+            marker.openPopup()
+          } catch (e) { console.error('[Map] focus pending error', e) }
+        } else {
+          console.warn('[Map] pending focus marker not found for', key)
+        }
+        this.pendingFocusKey = null
+      }
     },
     async ensureMap() {
       if (this.map) return
