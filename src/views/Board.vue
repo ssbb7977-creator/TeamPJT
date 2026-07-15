@@ -30,7 +30,6 @@
               <th class="px-4 py-3">제목</th>
               <th class="px-4 py-3">카테고리</th>
               <th class="px-4 py-3 hidden md:table-cell">날짜</th>
-              <th class="px-4 py-3 text-right">액션</th>
             </tr>
           </thead>
           <tbody>
@@ -58,9 +57,8 @@ export default {
   data() {
     return {
       posts: [],
-      selectedCategory: 'all',
+      selectedCategory: '',
       categories: [
-        { label: '전체', value: 'all' },
         { label: '추천', value: '추천' },
         { label: '맛집', value: '맛집' },
         { label: '축제', value: '축제' }
@@ -72,7 +70,7 @@ export default {
   },
   computed: {
     filtered() {
-      if (this.selectedCategory === 'all') return this.posts
+      if (!this.selectedCategory) return this.posts
       return this.posts.filter(p => p.category === this.selectedCategory)
     },
     totalPages() {

@@ -1,20 +1,36 @@
 <template>
-  <section class="upcoming-festivals bg-white rounded-xl p-4">
-    <h2 class="text-lg font-semibold mb-3">Upcoming Festivals</h2>
-    <ul class="space-y-3">
-      <li v-for="f in picks" :key="f.contentid || f.title">
-        <div class="flex items-start gap-3">
-          <div class="w-20 h-12 bg-slate-200 overflow-hidden rounded">
-            <img v-if="f.firstimage" :src="f.firstimage" class="w-full h-full object-cover" />
-          </div>
-          <div>
-            <div class="text-sm font-bold">{{ f.title }}</div>
-            <div class="text-xs text-slate-600">{{ formatDate(f._eventDate) }}</div>
-            <div class="text-xs text-slate-600">{{ f.addr1 }}</div>
-          </div>
+  <section class="upcoming-festivals">
+    <div class="container-wrap">
+      <div class="section-header">
+        <h2 class="section-title">추천 축제</h2>
+        <router-link class="view-all-link" :to="{ path: '/map', query: { category: 'festival' } }">전체보기 →</router-link>
+      </div>
+      <div class="fest-grid">
+        <div class="left-area">
+          <article class="hero-fest" v-if="picks[0]">
+            <div class="hero-img" v-if="picks[0].firstimage" :style="`background-image:url(${picks[0].firstimage})`"></div>
+            <div class="hero-overlay"></div>
+            <div class="hero-content">
+              <div class="date-badge">{{ formatDate(picks[0]._eventDate) }}</div>
+              <h3 class="hero-title">{{ picks[0].title }}</h3>
+              <p class="hero-excerpt">{{ picks[0].addr1 }}</p>
+            </div>
+          </article>
         </div>
-      </li>
-    </ul>
+
+        <div class="right-area">
+          <article class="side-fest" v-if="picks[1]">
+            <div class="side-img" v-if="picks[1].firstimage" :style="`background-image:url(${picks[1].firstimage})`"></div>
+            <div class="side-title">{{ picks[1].title }}</div>
+          </article>
+
+          <article class="side-fest" v-if="picks[2]">
+            <div class="side-img" v-if="picks[2].firstimage" :style="`background-image:url(${picks[2].firstimage})`"></div>
+            <div class="side-title">{{ picks[2].title }}</div>
+          </article>
+        </div>
+      </div>
+    </div>
   </section>
 </template>
 
@@ -56,5 +72,33 @@ export default {
 </script>
 
 <style scoped>
-.upcoming-festivals { }
+.upcoming-festivals { padding:80px 0; }
+.container-wrap { max-width:1200px; margin:0 auto; padding:0 24px }
+.section-header { display:flex; align-items:center; justify-content:space-between; gap:12px; margin-bottom:12px }
+.view-all-link { color:#0b5fb8; font-weight:700 }
+.section-title { font-size:28px; font-weight:800; margin-bottom:20px }
+.fest-grid { display:grid; grid-template-columns: 2fr 1fr; gap:20px; align-items:start; height:460px }
+
+.hero-fest { position:relative; border-radius:20px; overflow:hidden; height:460px; width:100%; transition:transform .25s ease, box-shadow .25s ease }
+.hero-fest:hover { transform:translateY(-6px); box-shadow: 0 20px 40px rgba(2,6,23,0.12) }
+.hero-img { position:absolute; inset:0; background-size:cover; background-position:center }
+.hero-overlay { position:absolute; inset:0; background: linear-gradient(rgba(0,0,0,.05), rgba(0,0,0,.65)) }
+.hero-content { position:absolute; left:24px; bottom:24px; z-index:3; color:#fff }
+.date-badge { background:rgba(255,255,255,0.08); padding:6px 10px; border-radius:999px; font-size:13px; display:inline-block; margin-bottom:10px }
+.hero-title { font-size:28px; font-weight:800; margin:0 0 8px }
+.hero-excerpt { margin:0; opacity:0.95 }
+
+.right-area { display:flex; flex-direction:column; gap:20px }
+.side-fest { position:relative; border-radius:18px; overflow:hidden; height:220px; transition:transform .25s ease, box-shadow .25s ease }
+.side-fest:hover { transform:translateY(-6px); box-shadow: 0 12px 28px rgba(2,6,23,0.08) }
+.side-img { position:absolute; inset:0; background-size:cover; background-position:center }
+.side-title { position:absolute; bottom:12px; left:12px; z-index:2; color:#fff; font-weight:800; text-shadow: 0 2px 6px rgba(0,0,0,0.6) }
+
+@media (max-width: 768px) {
+  .fest-grid { grid-template-columns: 1fr; height:auto }
+  .hero-fest { height:320px }
+  .side-fest { height:160px }
+  .container-wrap { padding:0 16px }
+}
+
 </style>

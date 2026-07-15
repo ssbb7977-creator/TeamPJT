@@ -18,7 +18,6 @@ export default {
     categories: {
       type: Array,
       default: () => [
-        { label: '전체', value: 'all' },
         { label: '관광지', value: 'tour' },
         { label: '문화시설', value: 'culture' },
         { label: '축제', value: 'festival' },

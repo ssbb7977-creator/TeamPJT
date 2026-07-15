@@ -16,7 +16,6 @@
 
       <div class="mt-4">
         <div class="flex flex-wrap gap-2">
-          <button @click="selectCategory('all')" :class="['px-4 py-2 rounded-full', selectedCategory==='all' ? 'bg-primary text-white' : 'bg-slate-100 text-slate-700']">전체</button>
           <button @click="selectCategory('tour')" :class="['px-4 py-2 rounded-full', selectedCategory==='tour' ? 'bg-primary text-white' : 'bg-slate-100 text-slate-700']">관광지</button>
           <button @click="selectCategory('culture')" :class="['px-4 py-2 rounded-full', selectedCategory==='culture' ? 'bg-primary text-white' : 'bg-slate-100 text-slate-700']">문화시설</button>
           <button @click="selectCategory('festival')" :class="['px-4 py-2 rounded-full', selectedCategory==='festival' ? 'bg-primary text-white' : 'bg-slate-100 text-slate-700']">축제</button>
@@ -98,7 +97,7 @@ export default {
   components: { CategoryFilter, PlaceCard },
   data() {
     return {
-      selectedCategory: 'all',
+      selectedCategory: 'tour',
       places: [],
       map: null,
       markerLayer: null,
@@ -109,16 +108,24 @@ export default {
   },
   computed: {
     selectedLabel() {
-      const map = { all: '전체', tour: '관광지', culture: '문화시설', festival: '축제', sports: '레포츠', stay: '숙박', shopping: '쇼핑' }
+      const map = { tour: '관광지', culture: '문화시설', festival: '축제', sports: '레포츠', stay: '숙박', shopping: '쇼핑' }
       return map[this.selectedCategory] || this.selectedCategory
     },
     filteredPlaces() { return Array.isArray(this.places) ? this.places : [] }
   },
-  mounted() {
+    async mounted() {
     console.log('[Map] mounted')
-    this.load('all')
-    // if route has focus query on initial load
+    // If initial route has a category query, use it; otherwise load default
     const q = this.$route && this.$route.query ? this.$route.query : {}
+    if (q && q.category) {
+      this.selectedCategory = q.category
+      await this.onCategoryChange(q.category)
+    } else {
+      await this.load(this.selectedCategory)
+      await this.ensureMap()
+      this.renderMarkers()
+    }
+    // if route has focus query on initial load, handle it
     if (q && q.focus) {
       this.pendingFocusKey = q.focus
       const cat = q.category || this.selectedCategory
@@ -143,18 +150,7 @@ export default {
       this.selectedCategory = val
       // load data once, then handle map and markers explicitly
       await this.load(val)
-      if (val === 'all') {
-        if (this.map) {
-          this.map.remove()
-          this.map = null
-          this.markerLayer = null
-          const el = this.$refs.mapEl
-          if (el && el._leaflet_id) try { delete el._leaflet_id } catch(e){ /* ignore */ }
-          console.log('[Map] map removed for all category')
-        }
-        return
-      }
-      // for non-all categories: ensure map then render markers
+      // ensure map then render markers
       await this.ensureMap()
       this.renderMarkers()
     },
@@ -164,7 +160,12 @@ export default {
     },
     // handle route query changes
     handleRouteQuery(q) {
-      if (q && q.focus) {
+      if (!q) return
+      if (q.category) {
+        const cat = q.category
+        this.onCategoryChange(cat)
+      }
+      if (q.focus) {
         this.pendingFocusKey = q.focus
         const cat = q.category || this.selectedCategory
         this.onCategoryChange(cat)
