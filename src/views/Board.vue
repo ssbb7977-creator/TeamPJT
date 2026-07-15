@@ -17,7 +17,7 @@
       </div>
 
       <div class="mt-4 flex flex-wrap gap-2">
-        <button v-for="c in categories" :key="c.value" @click="selectCategory(c.value)" :class="['px-4 py-2 rounded-full', selectedCategory===c.value ? 'bg-primary text-white' : 'bg-slate-100 text-slate-700']">{{ c.label }}</button>
+        <TagChip v-for="c in categories" :key="c.value" :label="c.label" :active="selectedCategory===c.value" @click="selectCategory(c.value)" />
       </div>
     </header>
 
@@ -34,34 +34,27 @@
             </tr>
           </thead>
           <tbody>
-            <tr v-for="p in pagedPosts" :key="p.id" class="hover:bg-surface-container-lowest transition-colors">
-              <td class="px-4 py-3">
-                <router-link :to="`/board/${p.id}`" class="font-medium text-on-surface">{{ p.title }}</router-link>
-              </td>
-              <td class="px-4 py-3">{{ p.category }}</td>
-              <td class="px-4 py-3 hidden md:table-cell">{{ new Date(p.createdAt).toLocaleDateString() }}</td>
-              <td class="px-4 py-3 text-right">
-                <router-link :to="`/board/${p.id}`" class="text-primary">보기</router-link>
-              </td>
-            </tr>
+            <BoardRow v-for="p in pagedPosts" :key="p.id" :post="p" />
           </tbody>
         </table>
       </div>
     </div>
 
     <!-- Pagination -->
-    <div class="flex items-center justify-center gap-2 mt-4">
-      <button class="px-3 py-1 border" @click="prevPage" :disabled="page===1">◀</button>
-      <button v-for="n in totalPages" :key="n" @click="gotoPage(n)" :class="['px-3 py-1 rounded', page===n? 'bg-primary text-white':'border']">{{ n }}</button>
-      <button class="px-3 py-1 border" @click="nextPage" :disabled="page===totalPages">▶</button>
+    <div class="mt-4">
+      <Pagination :page="page" :total="totalPages" @change="gotoPage" />
     </div>
   </div>
 </template>
 
 <script>
 import { loadPosts, seedExample } from '../utils/posts'
+import TagChip from '../components/TagChip.vue'
+import Pagination from '../components/Pagination.vue'
+import BoardRow from '../components/BoardRow.vue'
 
 export default {
+  components: { TagChip, Pagination, BoardRow },
   data() {
     return {
       posts: [],
