@@ -1,6 +1,6 @@
 export async function chatWithOpenAI(systemPrompt, userPrompt, options = {}) {
   const model = options.model || 'gpt-5-mini'
-  const temperature = typeof options.temperature === 'number' ? options.temperature : 0
+  // Note: this model does not support changing `temperature`; do not send it in requests.
 
   const apiKey = import.meta.env.VITE_OPENAI_KEY
   if (!apiKey) throw new Error('Missing VITE_OPENAI_KEY in environment')
@@ -10,8 +10,7 @@ export async function chatWithOpenAI(systemPrompt, userPrompt, options = {}) {
     messages: [
       { role: 'system', content: systemPrompt },
       { role: 'user', content: userPrompt }
-    ],
-    temperature
+    ]
   }
 
   const res = await fetch('https://api.openai.com/v1/chat/completions', {

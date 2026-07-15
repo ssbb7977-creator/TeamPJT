@@ -8,7 +8,7 @@
           <h1 class="text-2xl font-bold text-white drop-shadow">{{ post.title }}</h1>
         </div>
         <div class="p-6">
-          <div class="meta text-sm text-slate-600 mb-4">{{ new Date(post.createdAt).toLocaleString() }} · {{ post.category }}</div>
+          <div class="meta text-sm text-slate-600 mb-4">{{ formatTimestamp(post.createdAt) }} · {{ post.category }}</div>
 
           <div v-if="!editing" class="content text-base text-slate-800">
             <p style="white-space:pre-wrap">{{ post.content }}</p>
@@ -56,6 +56,11 @@ export default {
     this.post = getPost(id)
   },
   methods: {
+    formatTimestamp(ts) {
+      if (!ts) return ''
+      const d = new Date(ts)
+      return isNaN(d.getTime()) ? '' : d.toLocaleString()
+    },
     startEdit() {
       this.form = { title: this.post.title, content: this.post.content, category: this.post.category }
       this.pendingAction = 'edit'

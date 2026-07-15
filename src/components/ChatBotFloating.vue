@@ -14,7 +14,7 @@
         <div class="messages" ref="msgList">
           <div v-for="m in messages" :key="m.id" :class="['msg', m.role]">
             <div class="text">{{ m.text }}</div>
-            <div class="ts">{{ new Date(m.ts).toLocaleTimeString() }}</div>
+            <div class="ts">{{ formatTime(m.ts) }}</div>
           </div>
         </div>
         <div v-if="error" class="chat-error">{{ error }}</div>
@@ -50,6 +50,7 @@ export default {
     error() { return this.store.error }
   },
   methods: {
+    formatTime(ts) { if (!ts) return '' ; const d = new Date(ts); return isNaN(d.getTime()) ? '' : d.toLocaleTimeString() },
     toggle() { this.open = !this.open; this.$nextTick(()=>{ this.scrollBottom(); if(this.open && this.$refs.inputEl) this.$refs.inputEl.focus(); }) },
     close() { this.open = false },
     scrollBottom() { const el = this.$refs.msgList; if (el) el.scrollTop = el.scrollHeight },

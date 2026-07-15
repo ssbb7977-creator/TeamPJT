@@ -15,16 +15,25 @@ function normalize(s) {
 }
 
 async function loadJsonFile(name) {
-  try {
-    const path = `/Busan_data/${encodeURIComponent(name)}`
-    const r = await fetch(path)
-    if (!r.ok) return []
-    const j = await r.json()
-    return Array.isArray(j) ? j : (j.items || [])
-  } catch (e) {
-    console.error('loadJsonFile error', name, e)
-    return []
+  const candidates = [
+    `/Busan_data/${encodeURIComponent(name)}`,
+    `Busan_data/${encodeURIComponent(name)}`,
+    `./Busan_data/${encodeURIComponent(name)}`
+  ]
+
+  for (const path of candidates) {
+    try {
+      const r = await fetch(path)
+      if (!r.ok) continue
+      const j = await r.json()
+      return Array.isArray(j) ? j : (j.items || [])
+    } catch (e) {
+      // try next candidate
+    }
   }
+
+  console.error('loadJsonFile error: failed to fetch any candidate paths', name, candidates)
+  return []
 }
 
 export async function searchContext(query, limit = 5) {

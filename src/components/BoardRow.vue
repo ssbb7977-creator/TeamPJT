@@ -12,7 +12,7 @@
     <td class="px-4 py-3">{{ post.category }}</td>
     <td class="px-4 py-3 hidden md:table-cell">
       <div class="date-cell">
-        <span>{{ new Date(post.createdAt).toLocaleDateString() }}</span>
+        <span>{{ formatDate(post.createdAt) }}</span>
         <button @click.stop="toggleFavorite" class="favorite-btn" aria-label="favorite">
           <span v-if="favorited">❤</span>
           <span v-else>♡</span>
@@ -44,6 +44,11 @@ export default {
     }
   },
   methods: {
+    formatDate(ts) {
+      if (!ts) return ''
+      const d = new Date(ts)
+      return isNaN(d.getTime()) ? '' : d.toLocaleDateString()
+    },
     toggleFavorite() {
       try {
         // store per-user favorites in localStorage
