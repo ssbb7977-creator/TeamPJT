@@ -7,10 +7,7 @@
     <div class="places-grid">
       <article v-for="p in places.slice(0,8)" :key="p.contentid || p.title" class="place-card-grid">
         <div class="pc-img">
-          <picture>
-            <source :srcset="(p.firstimage || '/images/default/default1').replace(/\.(jpg|png|jpeg)$/i, '.webp')" type="image/webp" />
-            <img :src="p.firstimage || '/images/default/default1.jpg'" loading="lazy" decoding="async" alt="" />
-          </picture>
+          <img :src="p.firstimage || '/images/default/default1.webp'" loading="lazy" decoding="async" alt="" />
         </div>
         <div class="pc-body">
           <div class="pc-category">{{ p.contentType || p.contenttype || '' }}</div>
