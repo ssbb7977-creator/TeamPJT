@@ -1,6 +1,9 @@
 <template>
   <article class="place-card">
-    <img :src="place.firstimage || '/images/default/default1.jpg'" loading="lazy" decoding="async" class="thumb" alt="" />
+    <picture>
+      <source :srcset="(place.firstimage || '/images/default/default1').replace(/\.(jpg|png|jpeg)$/i, '.webp')" type="image/webp" />
+      <img :src="place.firstimage || '/images/default/default1.jpg'" loading="lazy" decoding="async" class="thumb" alt="" />
+    </picture>
     <div class="content">
       <h4 class="title">{{ place.title || place.name }}</h4>
       <div class="category">{{ place.contentType || place.contenttype || '' }}</div>

@@ -7,6 +7,7 @@
     "build": "vite build",
     "preview": "vite preview"
     ,"copy-busandata": "node scripts/copy_busan_data.js"
+    ,"convert-images": "node scripts/convert-default-images.js"
   },
   "dependencies": {
     "@tailwindcss/vite": "^4.3.2",
