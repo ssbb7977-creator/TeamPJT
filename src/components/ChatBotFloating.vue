@@ -109,7 +109,17 @@ export default {
 .suggest-btn { background:#eef5ff; border:0; padding:6px 8px; border-radius:8px; cursor:pointer; color:#0b5fb8 }
 
 @media (max-width:640px) {
-  .chatbox { width:100vw; height:50vh; right:0; left:0; bottom:0; border-radius:12px 12px 0 0 }
+  .chatbox { width:100vw; height:70vh; right:0; left:0; bottom:0; border-radius:16px 16px 0 0 }
+  .chatbot-floating { right:20px; bottom:20px }
+  .composer { position: sticky; bottom: 0; background: #fff; z-index: 10 }
+  .messages { overflow-y: auto; }
+}
+
+@media (max-width:768px) {
+  .chatbox { width:100%; height:70vh; right:0; left:0; bottom:0; border-radius:16px 16px 0 0 }
+  .chatbot-floating { right:20px; bottom:20px }
+  .composer { position: sticky; bottom: 0; background: #fff; z-index: 10 }
+  .messages { overflow-y: auto; }
 }
 
 .fade-enter-active, .fade-leave-active { transition: opacity .2s }
