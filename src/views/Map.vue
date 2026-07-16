@@ -226,6 +226,30 @@ export default {
         console.error('[Map] focusPlace error', e)
       }
     },
+    zoomIn() {
+      try { if (this.map) this.map.zoomIn() } catch (e) { console.warn('[Map] zoomIn failed', e) }
+    },
+    zoomOut() {
+      try { if (this.map) this.map.zoomOut() } catch (e) { console.warn('[Map] zoomOut failed', e) }
+    },
+    async locateUser() {
+      if (this.userLocation) {
+        try {
+          this.map.flyTo([this.userLocation.lat, this.userLocation.lng], 13)
+        } catch (e) {}
+        return
+      }
+      if (navigator && navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(async pos => {
+          this.userLocation = { lat: pos.coords.latitude, lng: pos.coords.longitude }
+          try { localStorage.setItem('localhub_location', JSON.stringify({ lat: this.userLocation.lat, lng: this.userLocation.lng, timestamp: Date.now() })) } catch(e){}
+          await this.computeDistances()
+          try { this.map.flyTo([this.userLocation.lat, this.userLocation.lng], 13) } catch(e){}
+        }, err => { console.warn('[Map] locateUser denied', err) })
+      } else {
+        alert('브라우저에서 위치 정보를 사용할 수 없습니다.')
+      }
+    },
     applyDistanceSort() {
       try {
         this.places.sort((a,b)=>{
