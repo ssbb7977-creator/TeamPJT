@@ -127,12 +127,30 @@ export default {
     }
   },
   created() {
-    // request location once on entry
+    // Try to restore stored user location to avoid re-prompting for geolocation
+    try {
+      const stored = localStorage.getItem('localhub_user_location_v1')
+      if (stored) {
+        const obj = JSON.parse(stored)
+        const age = Date.now() - (obj.timestamp || 0)
+        const FIVE_MIN = 1000 * 60 * 5
+        if (age < FIVE_MIN && obj.lat != null && obj.lng != null) {
+          this.userLocation = { lat: obj.lat, lng: obj.lng }
+          // distances will be computed after data is loaded in mounted
+          console.debug('[Map] restored user location from storage')
+          return
+        }
+      }
+    } catch (e) { /* ignore parse errors */ }
+
+    // if no recent stored location, request geolocation (once)
     if (navigator && navigator.geolocation && typeof navigator.geolocation.getCurrentPosition === 'function') {
       try {
         navigator.geolocation.getCurrentPosition(
           pos => {
             this.userLocation = { lat: pos.coords.latitude, lng: pos.coords.longitude }
+            // save to localStorage
+            try { localStorage.setItem('localhub_user_location_v1', JSON.stringify({ lat: this.userLocation.lat, lng: this.userLocation.lng, timestamp: Date.now() })) } catch (e) {}
             this.computeDistances()
           },
           err => {
