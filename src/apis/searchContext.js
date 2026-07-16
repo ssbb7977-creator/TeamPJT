@@ -217,8 +217,11 @@ async function searchData(entity, limit = 10) {
         return addr.includes(loc) || title.includes(loc)
       })
       candidates = candidates.concat(locCat.filter(it => !candidates.includes(it)))
+      // Do NOT add catItems from other locations when a location is specified
+      // Skip adding catItems that are outside the requested location
+    } else {
+      candidates = candidates.concat(catItems.filter(it => !candidates.includes(it)))
     }
-    candidates = candidates.concat(catItems.filter(it => !candidates.includes(it)))
   }
 
   // Final fallback: if still too few and location was provided, include any location matches across data
@@ -255,15 +258,19 @@ async function searchData(entity, limit = 10) {
     const title = (it.title || it.name || '').toLowerCase()
     const addr = (it.addr1 || it.addr || '').toLowerCase()
     const overview = (overviewField(it) || '').toLowerCase()
-    if (loc && addr.includes(loc)) score += 50
+    if (loc && addr.includes(loc)) score += 100
     if (cat && it.__source === cat) score += 30
+    // theme match gives a single boost if any of the theme keywords appear
     if (themeWords.length > 0) {
-      if (themeWords.some(k => title.includes(k))) score += 20
-      if (themeWords.some(k => addr.includes(k))) score += 20
-      if (themeWords.some(k => overview.includes(k))) score += 10
+      if (themeWords.some(k => title.includes(k) || addr.includes(k) || overview.includes(k))) score += 20
     }
-    if (score <= 0) score = 1 // minimal score to keep ordering among candidates
-    results.push({ type: 'place', title: it.title || it.name || '', addr: it.addr1 || it.addr || '', tel: it.tel || '', score, raw: it })
+    // title keyword matches (from user's question) small boost
+    const kw = Array.isArray(entity.keywords) ? entity.keywords.map(k => k.toLowerCase()) : []
+    if (kw.length > 0 && kw.some(k => title.includes(k))) score += 5
+    // Only include items with positive score
+    if (score > 0) {
+      results.push({ type: 'place', title: it.title || it.name || '', addr: it.addr1 || it.addr || '', tel: it.tel || '', score, raw: it })
+    }
     if (results.length >= Math.min(limit, 10)) break
   }
 
