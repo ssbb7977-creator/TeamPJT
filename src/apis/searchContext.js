@@ -90,97 +90,118 @@ function normalize(s) {
 
         if (score > 0) {
           const id = it.contentid || title || addr
-          if (!seen.has(id)) {
-            seen.add(id)
-            candidates.push({ type: 'place', title, addr, tel: it.tel||'', snippet: (it.overview||'').slice(0,120), meta: f.replace('.json',''), score })
+          import { loadPosts } from '../utils/posts'
+
+          const DATA_FILES = [
+            '부산_관광지.json',
+            '부산_레포츠.json',
+            '부산_문화시설.json',
+            '부산_쇼핑.json',
+            '부산_숙박.json',
+            '부산_여행코스.json',
+            '부산_축제공연행사.json'
+          ]
+
+          function normalize(s) {
+            return (s || '').toString().toLowerCase()
           }
-        }
-      }
-    }
 
-    // sort candidates by score desc and return up to limit formatted results
-    candidates.sort((a,b)=> (b.score||0) - (a.score||0))
-    if (candidates.length === 0) return []
-    return formatResults(candidates.slice(0, Math.min(limit, candidates.length)))
-  const results = []
+          function extractKeywords(query) {
+            if (!query) return []
+            const cleaned = (query || '')
+              .toString()
+              .replace(/[?.,!()"'`]/g, ' ')
+              .replace(/은|는|이|가|을|를|에|에서|으로|와|과|도|만|으로서/g, ' ')
+              .toLowerCase()
+              .trim()
+            const parts = cleaned.split(/\s+/).map(p => p.trim()).filter(Boolean)
+            const keys = parts.filter(p => p.length >= 2)
+            return keys.length ? keys : parts
+          }
 
-  // search posts (localStorage)
-  try {
-    const posts = loadPosts() || []
-    for (const p of posts) {
-      const hay = normalize((p.title || '') + ' ' + (p.content || '') + ' ' + (p.category || ''))
-      const matched = keywords.some(k => hay.includes(k))
-      if (matched) {
-        results.push({ type: 'post', title: p.title, snippet: p.content || '', meta: p.category || '' })
-        if (results.length >= limit) return formatResults(results)
-      }
-    }
-  } catch (e) {
-    // ignore
-  }
+          async function loadJsonFile(name) {
+            const candidates = [
+              `/Busan_data/${encodeURIComponent(name)}`,
+              `Busan_data/${encodeURIComponent(name)}`,
+              `./Busan_data/${encodeURIComponent(name)}`
+            ]
+            for (const path of candidates) {
+              try {
+                const r = await fetch(path)
+                if (!r.ok) continue
+                const j = await r.json()
+                return Array.isArray(j) ? j : (j.items || [])
+              } catch (e) {
+                // try next
+              }
+            }
+            return []
+          }
 
-  // search Busan_data files
-  for (const f of DATA_FILES) {
-    const items = await loadJsonFile(f)
-    // special handling for festival month queries: collect month matches first
-    const monthMatches = []
-    const otherMatches = []
-    for (const it of items) {
-      const title = it.title || it.name || ''
-      const addr = it.addr1 || it.address || ''
-      const hay = normalize(title + ' ' + addr + ' ' + (it.overview || it.intro || ''))
-      const keywordMatched = keywords.some(k => hay.includes(k))
+          export async function searchContext(query, limit = 10) {
+            if (!query) return []
+            const periodPattern = /(오늘|내일|이번주|이번 주|다음주|다음 주|주말|몇 시|예약|운영기간|운영 기간|기간)/
+            if (periodPattern.test(query)) return []
 
-      // try to parse event start month if available
-      const evStr = it.eventstartdate || it.eventstart || it.eventstart || it.modifiedtime || ''
-      let evMonth = null
-      if (evStr) {
-        const s = evStr.toString()
-        if (s.length >= 6) {
-          const mm = parseInt(s.slice(4,6))
-          if (!isNaN(mm) && mm >= 1 && mm <= 12) evMonth = mm
-        }
-      }
+            const tokens = extractKeywords(query)
 
-      const matchesMonth = monthFilter && evMonth === monthFilter
+            const categoryMap = {
+              '숙박': '부산_숙박.json','호텔': '부산_숙박.json','모텔': '부산_숙박.json','펜션': '부산_숙박.json',
+              '맛집': '부산_관광지.json','음식': '부산_관광지.json','식당': '부산_관광지.json',
+              '관광': '부산_관광지.json','명소': '부산_관광지.json',
+              '전시': '부산_문화시설.json','박물관': '부산_문화시설.json','미술관': '부산_문화시설.json','공연': '부산_문화시설.json',
+              '쇼핑': '부산_쇼핑.json','시장': '부산_쇼핑.json','아울렛': '부산_쇼핑.json',
+              '축제': '부산_축제공연행사.json','행사': '부산_축제공연행사.json',
+              '러닝': '부산_관광지.json','산책': '부산_관광지.json','운동': '부산_레포츠.json'
+            }
 
-      if (monthFilter && f === '부산_축제공연행사.json') {
-        // festival month query: prefer items that occur in requested month
-        if (matchesMonth && (keywordMatched || true)) monthMatches.push({ type: 'place', title, addr, tel: it.tel||'', snippet: (it.overview||'').slice(0,120), meta: f.replace('.json','') })
-        else if (keywordMatched) otherMatches.push({ type: 'place', title, addr, tel: it.tel||'', snippet: (it.overview||'').slice(0,120), meta: f.replace('.json','') })
-      } else {
-        if (keywordMatched) otherMatches.push({ type: 'place', title, addr, tel: it.tel||'', snippet: (it.overview||'').slice(0,120), meta: f.replace('.json','') })
-      }
-    }
+            const themeTokens = ['데이트','러닝','가족','아이','키즈','체험','추천']
+            let categoryFile = null
+            let theme = null
+            for (const t of tokens) {
+              if (!categoryFile && categoryMap[t]) categoryFile = categoryMap[t]
+              if (!theme && themeTokens.includes(t)) theme = t
+            }
 
-    // merge monthMatches first, then otherMatches
-    for (const m of monthMatches) results.push(m)
-    for (const o of otherMatches) results.push(o)
-  }
+            let location = null
+            for (const f of DATA_FILES) {
+              const items = await loadJsonFile(f)
+              for (const it of items) {
+                const addr = (it.addr1 || it.address || '').toString()
+                if (!addr) continue
+                const naddr = normalize(addr)
+                for (const t of tokens) {
+                  if (t.length < 2) continue
+                  if (naddr.includes(t)) { location = t; break }
+                }
+                if (location) break
+              }
+              if (location) break
+            }
 
-  // If monthFilter was requested, format as a compact festival list block
-  if (monthFilter) {
-    if (!results || results.length === 0) return []
-    const lines = results.slice(0, limit).map((it,i)=> `${i+1}. ${it.title}${it.addr ? ' — ' + it.addr : ''}${it.tel ? ' ('+it.tel+')' : ''}`)
-    return [ `${monthFilter}월 추천 축제:\n${lines.join('\n')}` ]
-  }
+            const candidates = []
+            const seen = new Set()
+            for (const f of (categoryFile ? [categoryFile] : DATA_FILES)) {
+              const items = await loadJsonFile(f)
+              for (const it of items) {
+                const title = it.title || it.name || ''
+                const addr = it.addr1 || it.address || ''
+                const hay = normalize(title + ' ' + addr + ' ' + (it.overview || it.intro || ''))
+                let score = 0
+                if (location && ((addr && normalize(addr).includes(location)) || normalize(title).includes(location))) score += 5
+                for (const t of tokens) if (hay.includes(t)) score += 2
+                if (theme) for (const tt of themeTokens) if (theme === tt && hay.includes(tt)) score += 3
+                if (score > 0) {
+                  const id = it.contentid || title || addr
+                  if (!seen.has(id)) {
+                    seen.add(id)
+                    candidates.push({ type: 'place', title, addr, tel: it.tel||'', snippet: (it.overview||'').slice(0,120), meta: f.replace('.json',''), score })
+                  }
+                }
+              }
+            }
 
-  return formatResults(results.slice(0, limit))
-}
-
-function formatResults(items) {
-  // return array of short strings to include in prompt
-  return items.map(it => {
-    if (it.type === 'post') return `게시글: ${it.title} / ${it.meta} / ${truncate(it.snippet,120)}`
-    // place: include address, phone, coordinates when available
-    const parts = []
-    parts.push(`제목: ${it.title}`)
-    if (it.addr) parts.push(`주소: ${it.addr}`)
-    if (it.tel) parts.push(`전화: ${it.tel}`)
-    if (it.mapx && it.mapy) parts.push(`좌표: ${it.mapy},${it.mapx}`)
-    const body = parts.join(' / ')
-    return `${it.meta}: ${body}`
-  })
-}
-
-function truncate(s, n) { return s && s.length > n ? s.slice(0,n-1) + '…' : (s||'') }
+            candidates.sort((a,b)=> (b.score||0) - (a.score||0))
+            if (candidates.length === 0) return []
+            return formatResults(candidates.slice(0, Math.min(limit, candidates.length)))
+          }
