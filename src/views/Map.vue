@@ -49,7 +49,7 @@
       <aside class="lg:col-span-4 flex flex-col gap-4">
         <div class="flex items-center justify-between px-2">
           <h2 class="text-lg font-semibold">추천 장소</h2>
-          <button class="text-primary">거리순</button>
+          <button class="text-primary" @click="sortByDistance">{{ calculatingDistance ? '거리 계산중...' : (sortBy==='distance' ? '거리순(정렬됨)' : '거리순') }}</button>
         </div>
         <div class="overflow-y-auto pr-2 space-y-4 custom-scrollbar" style="max-height:520px">
           <div v-for="place in filteredPlaces.slice(0,50)" :key="place.contentid || place.title" @click="focusPlace(place)" class="bg-white rounded-xl p-3 shadow-md border hover:border-primary transition-all cursor-pointer">
@@ -65,7 +65,7 @@
                 <p class="text-sm text-slate-600 mt-1 truncate">{{ place.addr1 }}</p>
                 <div class="mt-3 flex items-center gap-2">
                   <span class="bg-secondary-container text-on-secondary-container text-xs px-2 py-0.5 rounded-full font-bold">{{ place.lclsSystm2 || '' }}</span>
-                  <span class="text-primary text-sm flex items-center gap-1">거리: --km</span>
+                  <span class="text-primary text-sm flex items-center gap-1">{{ place.distance != null ? formatDistanceText(place.distance) : (calculatingDistance ? '거리 계산중...' : '거리 정보 없음') }}</span>
                 </div>
               </div>
             </div>
@@ -99,6 +99,9 @@ export default {
     return {
       selectedCategory: 'tour',
       places: [],
+      userLocation: null,
+      calculatingDistance: false,
+      sortBy: null, // 'distance' or null
       map: null,
       markerLayer: null,
       mapCentered: false,
@@ -111,7 +114,35 @@ export default {
       const map = { tour: '관광지', culture: '문화시설', festival: '축제', sports: '레포츠', stay: '숙박', shopping: '쇼핑' }
       return map[this.selectedCategory] || this.selectedCategory
     },
-    filteredPlaces() { return Array.isArray(this.places) ? this.places : [] }
+    filteredPlaces() {
+      const arr = Array.isArray(this.places) ? this.places.slice() : []
+      if (this.sortBy === 'distance') {
+        arr.sort((a,b)=>{
+          const da = (a.distance == null) ? Infinity : a.distance
+          const db = (b.distance == null) ? Infinity : b.distance
+          return da - db
+        })
+      }
+      return arr
+    }
+  },
+  created() {
+    // request location once on entry
+    if (navigator && navigator.geolocation && typeof navigator.geolocation.getCurrentPosition === 'function') {
+      try {
+        navigator.geolocation.getCurrentPosition(
+          pos => {
+            this.userLocation = { lat: pos.coords.latitude, lng: pos.coords.longitude }
+            this.computeDistances()
+          },
+          err => {
+            console.warn('[Map] geolocation failed or denied', err)
+            this.userLocation = null
+          },
+          { enableHighAccuracy: false, maximumAge: 1000 * 60 * 60 }
+        )
+      } catch (e) { console.warn('[Map] geolocation not available', e) }
+    }
   },
     async mounted() {
     console.log('[Map] mounted')
@@ -236,6 +267,57 @@ export default {
         }
         this.pendingFocusKey = null
       }
+    },
+    formatDistanceText(d) {
+      if (d == null || !isFinite(d)) return '거리 정보 없음'
+      if (d < 1) return `${Math.round(d * 1000)}m`
+      return `${(Math.round(d * 10) / 10).toFixed(1)}km`
+    },
+    async computeDistances() {
+      if (!this.userLocation) return
+      this.calculatingDistance = true
+      const lat1 = Number(this.userLocation.lat)
+      const lon1 = Number(this.userLocation.lng)
+      const batchSize = 100
+      const places = this.places || []
+      for (let i=0;i<places.length;i+=batchSize) {
+        const slice = places.slice(i, i+batchSize)
+        slice.forEach(p => {
+          const lat2 = parseFloat(p.mapy || p.mapY || p.latitude || 0)
+          const lon2 = parseFloat(p.mapx || p.mapX || p.longitude || 0)
+          if (!isFinite(lat2) || !isFinite(lon2)) { p.distance = null; return }
+          p.distance = this.haversine(lat1, lon1, lat2, lon2)
+        })
+        // allow UI to update between batches
+        // eslint-disable-next-line no-await-in-loop
+        await new Promise(res => setTimeout(res, 0))
+      }
+      this.calculatingDistance = false
+    },
+    haversine(lat1, lon1, lat2, lon2) {
+      const toRad = v => v * Math.PI / 180
+      const R = 6371 // km
+      const dLat = toRad(lat2 - lat1)
+      const dLon = toRad(lon2 - lon1)
+      const a = Math.sin(dLat/2) * Math.sin(dLat/2) + Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) * Math.sin(dLon/2) * Math.sin(dLon/2)
+      const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a))
+      return R * c
+    },
+    sortByDistance() {
+      if (!this.userLocation) {
+        // if no location, attempt to get once more
+        if (navigator && navigator.geolocation) {
+          navigator.geolocation.getCurrentPosition(pos => {
+            this.userLocation = { lat: pos.coords.latitude, lng: pos.coords.longitude }
+            this.computeDistances().then(()=> { this.sortBy = 'distance' })
+          }, err => { console.warn('geolocation denied', err); alert('거리 정보를 얻지 못했습니다.') })
+        } else {
+          alert('브라우저에서 위치 정보를 사용할 수 없습니다.')
+        }
+        return
+      }
+      // computeDistances may already have filled distances; set sort mode
+      this.sortBy = (this.sortBy === 'distance') ? null : 'distance'
     },
     async ensureMap() {
       if (this.map) return
