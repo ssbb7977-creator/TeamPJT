@@ -190,9 +190,16 @@ export default {
       if (this.userLocation) {
         try {
           await this.computeDistances()
+          // if currently sorted by distance, force re-apply sort to trigger updates
+          if (this.sortBy === 'distance') {
+            // toggle to force reactive recompute
+            this.sortBy = null
+            await this.$nextTick()
+            this.sortBy = 'distance'
+          }
         } catch (e) { console.warn('[Map] computeDistances failed after category change', e) }
       }
-      // ensure map then render markers
+      // ensure map then render markers (optimize marker updates)
       await this.ensureMap()
       this.renderMarkers()
     },
@@ -236,23 +243,43 @@ export default {
       // if showing all for category, show all items; otherwise limit? we'll show all up to a reasonable cap
       const cap = 1000
       const items = (this.places || []).slice(0, cap)
-      this.markerLayer.clearLayers()
-      // reset markers map
-      this.markers = {}
+      // Build key list for current items
+      const newKeys = new Set()
+      const itemByKey = {}
       items.forEach(p => {
+        const key = p.contentid || p.id || p.title
+        if (key) {
+          newKeys.add(key)
+          itemByKey[key] = p
+        }
+      })
+
+      // Remove markers that are no longer in newKeys
+      for (const existingKey of Object.keys(this.markers)) {
+        if (!newKeys.has(existingKey)) {
+          try {
+            const m = this.markers[existingKey]
+            this.markerLayer.removeLayer(m)
+            delete this.markers[existingKey]
+          } catch (e) { /* ignore */ }
+        }
+      }
+
+      // Add markers for keys that are new
+      for (const key of newKeys) {
+        if (this.markers[key]) continue // already exists
+        const p = itemByKey[key]
         const lat = parseFloat(p.mapy || p.mapY || p.latitude || 0)
         const lng = parseFloat(p.mapx || p.mapX || p.longitude || 0)
-        if (!isFinite(lat) || !isFinite(lng)) return
+        if (!isFinite(lat) || !isFinite(lng)) continue
         const marker = L.marker([lat, lng])
         const title = p.title || p.name || ''
         const addr = p.addr1 || p.address || ''
         const img = p.firstimage ? `<img src="${p.firstimage}" style="width:140px;height:84px;object-fit:cover;border-radius:6px;margin-bottom:6px;display:block">` : ''
         marker.bindPopup(`${img}<strong>${title}</strong><br/>${addr}`)
-        marker.addTo(this.markerLayer)
-        // store marker by id for list->marker interactions
-        const key = p.contentid || p.id || p.title
-        if (key) this.markers[key] = marker
-      })
+        this.markerLayer.addLayer(marker)
+        this.markers[key] = marker
+      }
       setTimeout(()=>{ try { this.map.invalidateSize() } catch(e){} }, 300)
       if (items.length && !this.mapCentered) {
         const first = items[0]
