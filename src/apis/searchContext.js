@@ -61,23 +61,59 @@ export async function searchContext(query, limit = 5) {
 
   // detect family/children intent (return curated family-friendly places)
   const isFamily = /(아이|어린이|유아|가족|키즈|아동)/.test((query||''))
-  if (isFamily) {
-    const familyKeywords = ['공원','과학','아쿠아','체험','박물관','놀이','키즈','수족관','어린이']
+  // recommendation detection (includes family intent)
+  const isRecommend = /(추천|추천해주|추천해줘|추천해주세요|추천해)/.test((query||''))
+  const isFamilyRecommend = isFamily || isRecommend
+
+  if (isFamilyRecommend) {
+    // scoring map
+    const scoreMap = {
+      '과학': 10,
+      '아쿠아': 10,
+      '수족관': 10,
+      '체험': 9,
+      '키즈': 9,
+      '박물관': 8,
+      '동물': 8,
+      '놀이': 8,
+      '공원': 4,
+      '해변': 5,
+      '체육공원': 2,
+      '기념': 0,
+      '묘지': 0
+    }
+
     const candidates = []
+    const seen = new Set()
     for (const f of DATA_FILES) {
       const items = await loadJsonFile(f)
       for (const it of items) {
         const title = it.title || it.name || ''
         const addr = it.addr1 || it.address || ''
         const hay = normalize(title + ' ' + addr + ' ' + (it.overview || it.intro || ''))
-        if (familyKeywords.some(k => hay.includes(k))) {
-          candidates.push({ type: 'place', title, addr, tel: it.tel || '', snippet: (it.overview || '').slice(0,120), meta: f.replace('.json','') })
-          if (candidates.length >= 10) break
+
+        // base score from keyword matches
+        let score = 0
+        for (const key in scoreMap) {
+          if (hay.includes(key)) score += scoreMap[key]
+        }
+
+        // slight boost if title directly matches a keyword from query
+        for (const k of keywords) if ((title || '').toLowerCase().includes(k)) score += 2
+
+        if (score > 0) {
+          const id = (it.contentid || it.title || it.addr1 || '')
+          if (!seen.has(id)) {
+            seen.add(id)
+            candidates.push({ type: 'place', title, addr, tel: it.tel || '', snippet: (it.overview || '').slice(0,120), meta: f.replace('.json',''), score })
+          }
         }
       }
-      if (candidates.length >= 10) break
     }
-    if (candidates.length > 0) return formatResults(candidates.slice(0,10))
+
+    // sort by score desc, take top 30 then return formatted contexts (OpenAI will pick 3)
+    candidates.sort((a,b)=> (b.score||0) - (a.score||0))
+    if (candidates.length > 0) return formatResults(candidates.slice(0, Math.min(30, candidates.length)))
     // fallthrough if none found
   }
 
