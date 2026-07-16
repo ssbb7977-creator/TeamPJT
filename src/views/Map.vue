@@ -126,54 +126,41 @@ export default {
       return arr
     }
   },
-  created() {
-    // Try to restore stored user location to avoid re-prompting for geolocation
+  // created() removed: location restore handled in mounted to ensure data loads first
+    async mounted() {
+    console.log('[Map] mounted')
+    // load data first
+    const q = this.$route && this.$route.query ? this.$route.query : {}
+    if (q && q.category) {
+      this.selectedCategory = q.category
+      await this.load(q.category)
+    } else {
+      await this.load(this.selectedCategory)
+    }
+
+    // try to restore saved location from localStorage
     try {
-      const stored = localStorage.getItem('localhub_user_location_v1')
+      const stored = localStorage.getItem('localhub_location')
       if (stored) {
         const obj = JSON.parse(stored)
         const age = Date.now() - (obj.timestamp || 0)
         const FIVE_MIN = 1000 * 60 * 5
         if (age < FIVE_MIN && obj.lat != null && obj.lng != null) {
           this.userLocation = { lat: obj.lat, lng: obj.lng }
-          // distances will be computed after data is loaded in mounted
           console.debug('[Map] restored user location from storage')
-          return
+          await this.computeDistances()
         }
       }
     } catch (e) { /* ignore parse errors */ }
 
-    // if no recent stored location, request geolocation (once)
-    if (navigator && navigator.geolocation && typeof navigator.geolocation.getCurrentPosition === 'function') {
-      try {
-        navigator.geolocation.getCurrentPosition(
-          pos => {
-            this.userLocation = { lat: pos.coords.latitude, lng: pos.coords.longitude }
-            // save to localStorage
-            try { localStorage.setItem('localhub_user_location_v1', JSON.stringify({ lat: this.userLocation.lat, lng: this.userLocation.lng, timestamp: Date.now() })) } catch (e) {}
-            this.computeDistances()
-          },
-          err => {
-            console.warn('[Map] geolocation failed or denied', err)
-            this.userLocation = null
-          },
-          { enableHighAccuracy: false, maximumAge: 1000 * 60 * 60 }
-        )
-      } catch (e) { console.warn('[Map] geolocation not available', e) }
-    }
-  },
-    async mounted() {
-    console.log('[Map] mounted')
-    // If initial route has a category query, use it; otherwise load default
-    const q = this.$route && this.$route.query ? this.$route.query : {}
-    if (q && q.category) {
-      this.selectedCategory = q.category
-      await this.onCategoryChange(q.category)
-    } else {
-      await this.load(this.selectedCategory)
-      await this.ensureMap()
-      this.renderMarkers()
-    }
+    // restore sort mode if any
+    try {
+      const s = localStorage.getItem('localhub_sort')
+      if (s) this.sortBy = s
+    } catch (e) {}
+
+    await this.ensureMap()
+    this.renderMarkers()
     // if route has focus query on initial load, handle it
     if (q && q.focus) {
       this.pendingFocusKey = q.focus
@@ -327,7 +314,7 @@ export default {
         if (navigator && navigator.geolocation) {
           navigator.geolocation.getCurrentPosition(pos => {
             this.userLocation = { lat: pos.coords.latitude, lng: pos.coords.longitude }
-            this.computeDistances().then(()=> { this.sortBy = 'distance' })
+            this.computeDistances().then(()=> { this.sortBy = 'distance'; try { localStorage.setItem('localhub_location', JSON.stringify({ lat: this.userLocation.lat, lng: this.userLocation.lng, timestamp: Date.now() })) } catch(e){}; try{ localStorage.setItem('localhub_sort', 'distance') } catch(e){} })
           }, err => { console.warn('geolocation denied', err); alert('거리 정보를 얻지 못했습니다.') })
         } else {
           alert('브라우저에서 위치 정보를 사용할 수 없습니다.')
@@ -336,6 +323,7 @@ export default {
       }
       // computeDistances may already have filled distances; set sort mode
       this.sortBy = (this.sortBy === 'distance') ? null : 'distance'
+      try{ localStorage.setItem('localhub_sort', this.sortBy || '') } catch(e){}
     },
     async ensureMap() {
       if (this.map) return
