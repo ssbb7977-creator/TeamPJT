@@ -186,6 +186,12 @@ export default {
       this.selectedCategory = val
       // load data once, then handle map and markers explicitly
       await this.load(val)
+      // if we have a user location, recalculate distances for the newly loaded places
+      if (this.userLocation) {
+        try {
+          await this.computeDistances()
+        } catch (e) { console.warn('[Map] computeDistances failed after category change', e) }
+      }
       // ensure map then render markers
       await this.ensureMap()
       this.renderMarkers()
