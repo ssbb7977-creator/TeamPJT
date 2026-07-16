@@ -5,7 +5,17 @@ import { searchContext, extractEntities } from '../apis/searchContext'
 const MAX_MESSAGES = 10
 const STORAGE_KEY = 'localhub_chat_history_v1'
 
-const SYSTEM_PROMPT = `너는 LocalHub 부산 관광 도우미이다.\n반드시 제공된 관광 JSON과 게시글 데이터만 이용하여 답변한다.\n없는 내용은 추측하지 말고 "관련 정보를 찾지 못했습니다." 라고 답변한다.\n모든 답변은 한국어로 작성한다.\n답변은 최대 5줄로 간결하게 작성한다.`
+const SYSTEM_PROMPT = `너는 LocalHub 부산 관광 도우미이다.
+
+반드시 Context에 있는 장소만 사용한다.
+Context에 없는 장소는 절대 생성하지 않는다.
+
+추천 요청이면 추천 목록만 출력한다.
+후보가 부족하면 있는 장소만 추천한다.
+후보가 부족하다는 설명이나 사과는 하지 않는다.
+
+모든 답변은 한국어로 작성한다.
+답변은 최대 5줄로 작성한다.`
 
 export const useChatStore = defineStore('chat', {
   state: () => ({
@@ -104,7 +114,23 @@ export const useChatStore = defineStore('chat', {
           const theme = entities && entities.theme ? entities.theme : null
           const headline = theme && THEME_PROMPTS[theme] ? THEME_PROMPTS[theme] : '추천 장소'
 
-          userPrompt = `${headline} 중에서 Context에 있는 장소만을 대상으로\n${count}곳만 추천하라.\n추천 이유는 한 줄로 작성하라.\nContext에 없는 장소는 절대 생성하지 마라.\n후보가 부족하면 있는 개수만 추천하라.\n'관련 정보를 찾지 못했습니다.'를 추천 목록 사이에 넣지 않는다.`
+          userPrompt = `${headline} 중에서 Context에 있는 장소만을 대상으로
+최대 ${count}곳만 추천하라.
+
+추천 이유는 한 줄만 작성한다.
+
+Context에 없는 장소는 절대 생성하지 않는다.
+
+후보가 부족하면 있는 장소만 추천한다.
+
+추천하지 못한 개수에 대해 설명하지 않는다.
+'관련 정보를 찾지 못했습니다.'
+'추천할 장소가 부족합니다.'
+'세 곳을 추천할 만큼 없습니다.'
+같은 문장은 절대 작성하지 않는다.
+
+추천 목록만 출력한다.
+번호나 불필요한 마무리 문장은 작성하지 않는다.`
         } else {
           userPrompt = `질문: ${text}`
         }
