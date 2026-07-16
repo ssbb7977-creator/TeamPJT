@@ -60,6 +60,17 @@ export const useChatStore = defineStore('chat', {
         const ctxItems = await searchContext(text, isRecommend ? 30 : 5)
         const contextText = ctxItems.length ? `${ctxItems.join('\n')}` : ''
 
+        // If no local context found, do not call OpenAI — return immediately
+        if (!ctxItems || ctxItems.length === 0) {
+          const reply = '관련 정보를 찾지 못했습니다.'
+          const assistantMsg = { role: 'assistant', text: reply, time: Date.now() }
+          this.messages.push(assistantMsg)
+          while (this.messages.length > MAX_MESSAGES) this.messages.shift()
+          this.saveToStorage()
+          this.loading = false
+          return
+        }
+
         // extract entities and build intent header
         const entities = extractEntities(text)
         const intentLines = [
@@ -79,25 +90,21 @@ export const useChatStore = defineStore('chat', {
 
         let userPrompt
         if (isRecommend) {
-          // theme-based recommendation prompts
+          // determine how many to recommend based on available context items
+          const count = Math.min(ctxItems.length, 3)
+
+          // theme-based headline (if theme exists)
           const THEME_PROMPTS = {
-            아이: '아이들과 가기 좋은 장소 3곳을 추천해라.',
-            데이트: '데이트하기 좋은 장소 3곳을 추천해라.',
-            러닝: '러닝하기 좋은 장소 3곳을 추천해라.',
-            사진: '사진 찍기 좋은 장소 3곳을 추천해라.',
-            가족: '가족과 가기 좋은 장소 3곳을 추천해라.'
+            아이: '아이들과 가기 좋은 장소',
+            데이트: '데이트하기 좋은 장소',
+            러닝: '러닝하기 좋은 장소',
+            사진: '사진 찍기 좋은 장소',
+            가족: '가족과 가기 좋은 장소'
           }
-
           const theme = entities && entities.theme ? entities.theme : null
-          if (theme && THEME_PROMPTS[theme]) {
-            userPrompt = `${THEME_PROMPTS[theme]}\n추천 이유는 한 줄로 작성하라.\nContext에 없는 장소는 절대 생성하지 마라.\n가장 적합한 장소부터 추천하라.`
-          } else {
-            // if no theme, fall back to user's original question
-            userPrompt = `질문: ${text}`
-          }
+          const headline = theme && THEME_PROMPTS[theme] ? THEME_PROMPTS[theme] : '추천 장소'
 
-          // Always enforce these recommendation constraints
-          userPrompt += `\n\nContext에 있는 장소만 추천한다.\n추천 이유를 알 수 없으면 '추천 이유'를 쓰지 않는다.\n'관련 정보를 찾지 못했습니다.'를 후보 사이에 넣지 않는다.`
+          userPrompt = `${headline} 중에서 Context에 있는 장소만을 대상으로\n${count}곳만 추천하라.\n추천 이유는 한 줄로 작성하라.\nContext에 없는 장소는 절대 생성하지 마라.\n후보가 부족하면 있는 개수만 추천하라.\n'관련 정보를 찾지 못했습니다.'를 추천 목록 사이에 넣지 않는다.`
         } else {
           userPrompt = `질문: ${text}`
         }

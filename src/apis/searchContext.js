@@ -113,11 +113,16 @@ export function extractEntities(question) {
   const category = detectCategory(question)
   const theme = extractTheme(question)
 
+  // Do not map running-like themes to a category. For themes that imply activity
+  // (러닝/산책/조깅), keep category null so we search broadly within the location.
+  const activityThemes = ['러닝', '산책', '조깅']
+  const finalCategory = activityThemes.includes(theme) ? null : category
+
   // keywords: split by non-letter/number and filter short words
   const q = question.toLowerCase()
   const keywords = q.split(/[^\p{L}0-9]+/u).map(s => s.trim()).filter(s => s && s.length > 1)
 
-  return { location, category, theme, keywords }
+  return { location, category: finalCategory, theme, keywords }
 }
 
 function scoreText(text, keywords) {
@@ -147,6 +152,7 @@ async function searchData(entity, limit = 10) {
   const posts = (await Promise.resolve(loadPosts())) || []
 
   const allItems = await loadAllData()
+  console.debug('1. all', allItems.length)
 
   // start with all items and filter down
   let candidates = allItems.slice()
@@ -166,11 +172,13 @@ async function searchData(entity, limit = 10) {
       const addr = (it.addr1 || it.addr || '').toLowerCase()
       return addr.includes(loc) || title.includes(loc)
     })
+    try { console.debug('2. after location', candidates.map(x => x.title)) } catch(e) {}
   }
 
   // 2) filter by category if provided and we have a direct data file mapping
   if (cat && DATA_FILES[cat]) {
     candidates = candidates.filter(it => it.__source === cat)
+    try { console.debug('3. after category', candidates.map(x => x.title)) } catch(e) {}
   }
 
   // 3) filter by theme keywords within the current candidates
@@ -181,6 +189,7 @@ async function searchData(entity, limit = 10) {
       const overview = (overviewField(it) || '').toLowerCase()
       return themeWords.some(w => title.includes(w) || addr.includes(w) || overview.includes(w))
     })
+    try { console.debug('4. after theme', candidates.map(x => x.title)) } catch(e) {}
   }
 
   // If too few candidates, relax constraints in order: remove theme filter, then category filter
@@ -222,6 +231,18 @@ async function searchData(entity, limit = 10) {
     candidates = candidates.concat(locAll.filter(it => !candidates.includes(it)))
   }
 
+  // If theme is running-like and still too few, supplement with 레포츠 items in the same location
+  const activityThemes = ['러닝', '산책', '조깅']
+  if (candidates.length < 3 && theme && activityThemes.includes(theme) && loc) {
+    const sportsItems = allItems.filter(it => it.__source === '레포츠')
+    const sportsLoc = sportsItems.filter(it => {
+      const title = (it.title || it.name || '').toLowerCase()
+      const addr = (it.addr1 || it.addr || '').toLowerCase()
+      return addr.includes(loc) || title.includes(loc)
+    })
+    candidates = candidates.concat(sportsLoc.filter(it => !candidates.includes(it)))
+  }
+
   // Deduplicate by title+addr and prepare results
   const seen = new Set()
   const results = []
@@ -248,6 +269,7 @@ async function searchData(entity, limit = 10) {
 
   // sort by score desc
   results.sort((a, b) => (b.score || 0) - (a.score || 0))
+  try { console.debug('5. final', results.map(x => x.title)) } catch(e) {}
   return results.slice(0, Math.min(limit, 10))
 }
 
