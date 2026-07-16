@@ -4,11 +4,16 @@
 
     <div v-else>
       <div class="bg-white rounded-xl shadow-md overflow-hidden border">
-        <div class="h-48 bg-slate-200 flex items-end p-4">
-          <h1 class="text-2xl font-bold text-white drop-shadow">{{ post.title }}</h1>
+        <div class="relative h-[320px] w-full overflow-hidden">
+          <img :src="imageUrl" alt="hero" class="w-full h-full object-cover" />
+          <div class="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent"></div>
+          <div class="absolute left-6 bottom-6 text-white">
+            <div v-if="post.category" class="inline-block bg-white/10 text-white px-3 py-1 rounded-full text-sm mb-2">{{ post.category }}</div>
+            <h1 class="text-3xl font-extrabold drop-shadow">{{ post.title }}</h1>
+            <div class="text-sm mt-1">{{ formatTimestamp(post.createdAt) }}</div>
+          </div>
         </div>
         <div class="p-6">
-          <div class="meta text-sm text-slate-600 mb-4">{{ formatTimestamp(post.createdAt) }} · {{ post.category }}</div>
 
           <div v-if="!editing" class="content text-base text-slate-800">
             <p style="white-space:pre-wrap">{{ post.content }}</p>
@@ -20,12 +25,14 @@
             <div class="mb-3"><label class="block text-sm font-medium mb-2">내용</label><textarea v-model="form.content" rows="6" class="w-full border rounded px-3 py-2"></textarea></div>
           </div>
 
-          <div class="actions flex gap-3 mt-4">
-            <button v-if="!editing" @click="startEdit" class="px-4 py-2 bg-primary text-white rounded">수정</button>
-            <button v-if="editing" @click="saveEdit" class="px-4 py-2 bg-primary text-white rounded">저장</button>
-            <button v-if="editing" @click="cancelEdit" class="px-4 py-2 border rounded">취소</button>
-            <button @click="confirmDelete" class="px-4 py-2 bg-red-600 text-white rounded">삭제</button>
+          <div class="actions flex items-center justify-between mt-4">
             <router-link to="/board" class="px-4 py-2 text-slate-600">목록</router-link>
+            <div class="flex items-center gap-3">
+              <button v-if="!editing" @click="startEdit" class="px-4 py-2 bg-blue-600 text-white rounded-lg">수정</button>
+              <button v-if="editing" @click="saveEdit" class="px-4 py-2 bg-blue-600 text-white rounded-lg">저장</button>
+              <button v-if="editing" @click="cancelEdit" class="px-4 py-2 border rounded-lg">취소</button>
+              <button @click="confirmDelete" class="px-4 py-2 bg-red-600 text-white rounded-lg">삭제</button>
+            </div>
           </div>
         </div>
       </div>
@@ -55,12 +62,25 @@ import { getPost, updatePost, deletePost } from '../utils/posts'
 
 export default {
   data() {
-    return { post: null, editing: false, form: {}, showPassword: false, pwd: '', pendingAction: null }
+    return { post: null, editing: false, form: {}, showPassword: false, pwd: '', pendingAction: null, selectedDefaultImage: null }
   },
   mounted() {
     const id = this.$route.params.id
     this.post = getPost(id)
+    // choose a random default image if none provided
+    if (this.post) {
+      const img = this.post.firstimage || this.post.image || ''
+      if (!img) {
+        const defaults = ['/images/default/default1.jpg','/images/default/default2.jpg']
+        this.selectedDefaultImage = defaults[Math.floor(Math.random()*defaults.length)]
+      }
+    }
   },
+  computed: {
+    imageUrl() {
+      if (!this.post) return '/images/default/default1.jpg'
+      return this.post.firstimage || this.post.image || this.selectedDefaultImage || '/images/default/default1.jpg'
+    },
   methods: {
     formatTimestamp(ts) {
       if (!ts) return ''
