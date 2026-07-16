@@ -6,6 +6,7 @@
       <nav :class="{ open: open }" class="main-nav">
         <router-link to="/" :class="{ active: isActive('/') }" @click.native="open = false">홈</router-link>
         <router-link to="/map" :class="{ active: isActive('/map') }" @click.native="open = false">지도</router-link>
+        <router-link to="/calender" :class="{ active: isActive('/calender') }" @click.native="open = false">캘린더</router-link>
         <router-link to="/board" :class="{ active: isActive('/board') }" @click.native="open = false">게시판</router-link>
       </nav>
 
@@ -26,6 +27,7 @@ export default {
   methods: {
     isActive(path) {
       if (path === '/board') return this.current === '/board' || this.current.startsWith('/board/')
+      if (path === '/calender') return this.current === '/calender'
       return this.current === path
     }
   }
