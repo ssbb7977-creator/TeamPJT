@@ -116,13 +116,6 @@ export default {
     },
     filteredPlaces() {
       const arr = Array.isArray(this.places) ? this.places.slice() : []
-      if (this.sortBy === 'distance') {
-        arr.sort((a,b)=>{
-          const da = (a.distance == null) ? Infinity : a.distance
-          const db = (b.distance == null) ? Infinity : b.distance
-          return da - db
-        })
-      }
       return arr
     }
   },
@@ -164,8 +157,7 @@ export default {
     // if route has focus query on initial load, handle it
     if (q && q.focus) {
       this.pendingFocusKey = q.focus
-      const cat = q.category || this.selectedCategory
-      this.onCategoryChange(cat)
+      // do not call onCategoryChange here to avoid duplicate loads; category already handled above
     }
   },
   watch: {
@@ -192,10 +184,8 @@ export default {
           await this.computeDistances()
           // if currently sorted by distance, force re-apply sort to trigger updates
           if (this.sortBy === 'distance') {
-            // toggle to force reactive recompute
-            this.sortBy = null
-            await this.$nextTick()
-            this.sortBy = 'distance'
+            // ensure places are sorted by distance
+            this.applyDistanceSort()
           }
         } catch (e) { console.warn('[Map] computeDistances failed after category change', e) }
       }
@@ -210,14 +200,13 @@ export default {
     // handle route query changes
     handleRouteQuery(q) {
       if (!q) return
-      if (q.category) {
+      if (q.category && q.category !== this.selectedCategory) {
         const cat = q.category
         this.onCategoryChange(cat)
       }
       if (q.focus) {
         this.pendingFocusKey = q.focus
-        const cat = q.category || this.selectedCategory
-        this.onCategoryChange(cat)
+        // do not force reload on focus change to avoid duplicate rendering; markers will handle pending focus
       }
     },
     focusPlace(place) {
@@ -237,11 +226,20 @@ export default {
         console.error('[Map] focusPlace error', e)
       }
     },
+    applyDistanceSort() {
+      try {
+        this.places.sort((a,b)=>{
+          const da = (a.distance == null) ? Infinity : a.distance
+          const db = (b.distance == null) ? Infinity : b.distance
+          return da - db
+        })
+      } catch (e) { console.warn('[Map] applyDistanceSort failed', e) }
+    },
     renderMarkers() {
       if (!this.map || !this.markerLayer) return
       this.$nextTick(() => { try { this.map.invalidateSize() } catch(e) {} })
       // if showing all for category, show all items; otherwise limit? we'll show all up to a reasonable cap
-      const cap = 1000
+      const cap = 200
       const items = (this.places || []).slice(0, cap)
       // Build key list for current items
       const newKeys = new Set()
@@ -316,21 +314,20 @@ export default {
       this.calculatingDistance = true
       const lat1 = Number(this.userLocation.lat)
       const lon1 = Number(this.userLocation.lng)
-      const batchSize = 100
       const places = this.places || []
-      for (let i=0;i<places.length;i+=batchSize) {
-        const slice = places.slice(i, i+batchSize)
-        slice.forEach(p => {
-          const lat2 = parseFloat(p.mapy || p.mapY || p.latitude || 0)
-          const lon2 = parseFloat(p.mapx || p.mapX || p.longitude || 0)
-          if (!isFinite(lat2) || !isFinite(lon2)) { p.distance = null; return }
-          p.distance = this.haversine(lat1, lon1, lat2, lon2)
-        })
-        // allow UI to update between batches
-        // eslint-disable-next-line no-await-in-loop
-        await new Promise(res => setTimeout(res, 0))
+      // compute all distances synchronously to avoid multiple re-renders
+      for (let i = 0; i < places.length; i++) {
+        const p = places[i]
+        const lat2 = parseFloat(p.mapy || p.mapY || p.latitude || 0)
+        const lon2 = parseFloat(p.mapx || p.mapX || p.longitude || 0)
+        if (!isFinite(lat2) || !isFinite(lon2)) { p.distance = null; continue }
+        p.distance = this.haversine(lat1, lon1, lat2, lon2)
       }
+      // wait a tick to let Vue render once
+      await this.$nextTick()
       this.calculatingDistance = false
+      // If currently sorting by distance, ensure places are sorted
+      if (this.sortBy === 'distance') this.applyDistanceSort()
     },
     haversine(lat1, lon1, lat2, lon2) {
       const toRad = v => v * Math.PI / 180
@@ -357,6 +354,13 @@ export default {
       // computeDistances may already have filled distances; set sort mode
       this.sortBy = (this.sortBy === 'distance') ? null : 'distance'
       try{ localStorage.setItem('localhub_sort', this.sortBy || '') } catch(e){}
+      if (this.sortBy === 'distance') {
+        // ensure distances are computed then sort
+        if (this.userLocation) {
+          await this.computeDistances()
+        }
+        this.applyDistanceSort()
+      }
     },
     async ensureMap() {
       if (this.map) return
