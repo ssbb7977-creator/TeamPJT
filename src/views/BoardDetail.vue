@@ -31,12 +31,18 @@
       </div>
 
       <div v-if="showPassword" class="pwd-modal">
-        <div class="box">
-          <label>비밀번호를 입력하세요</label>
-          <input v-model="pwd" type="password" />
-          <div class="buttons">
-            <button @click="pendingAction === 'edit' ? verifyForEdit() : verifyForDelete()">확인</button>
-            <button @click="closePwd">취소</button>
+        <div class="box-card rounded-2xl shadow-xl bg-white p-6">
+          <div class="flex items-center gap-3 mb-3">
+            <div class="text-2xl">🔒</div>
+            <div class="text-lg font-semibold">게시글 비밀번호 확인</div>
+          </div>
+          <p class="text-sm text-slate-600 mb-4">수정/삭제를 위해 비밀번호를 입력해주세요.</p>
+
+          <input v-model="pwd" type="password" placeholder="비밀번호" class="w-full border rounded px-4 py-3 mb-4" />
+
+          <div class="flex justify-end gap-3">
+            <button @click="closePwd" class="px-4 py-2 rounded bg-gray-200 text-gray-700">취소</button>
+            <button @click="pendingAction === 'edit' ? verifyForEdit() : verifyForDelete()" class="px-4 py-2 rounded bg-blue-600 text-white">확인</button>
           </div>
         </div>
       </div>
@@ -108,7 +114,7 @@ export default {
 <style scoped>
 .board-detail { max-width:900px; margin:0 auto }
 .meta { color:#475569 }
-.pwd-modal { position:fixed; left:0; right:0; top:0; bottom:0; display:flex; align-items:center; justify-content:center; background:rgba(0,0,0,0.4) }
-.pwd-modal .box { background:#fff; padding:16px; border-radius:8px }
+.pwd-modal { position:fixed; left:0; right:0; top:0; bottom:0; display:flex; align-items:center; justify-content:center; background:rgba(0,0,0,0.4); padding:16px }
+.box-card { max-width:420px; width:100%; }
 .buttons { display:flex; gap:8px; margin-top:8px }
 </style>
