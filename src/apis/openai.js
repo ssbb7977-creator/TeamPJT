@@ -5,13 +5,12 @@ export async function chatWithOpenAI(systemPrompt, userPrompt, options = {}) {
   const apiKey = import.meta.env.VITE_OPENAI_KEY
   if (!apiKey) throw new Error('Missing VITE_OPENAI_KEY in environment')
 
-  const body = {
-    model,
-    messages: [
-      { role: 'system', content: systemPrompt },
-      { role: 'user', content: userPrompt }
-    ]
-  }
+  // support an optional `context` system message between system and user
+  const messages = [{ role: 'system', content: systemPrompt }]
+  if (options.context) messages.push({ role: 'system', content: options.context })
+  messages.push({ role: 'user', content: userPrompt })
+
+  const body = { model, messages }
 
   const res = await fetch('https://api.openai.com/v1/chat/completions', {
     method: 'POST',

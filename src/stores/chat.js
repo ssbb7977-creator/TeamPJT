@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia'
 import { chatWithOpenAI } from '../apis/openai'
-import { searchContext } from '../apis/searchContext'
+import { searchContext, extractEntities } from '../apis/searchContext'
 
 const MAX_MESSAGES = 10
 const STORAGE_KEY = 'localhub_chat_history_v1'
@@ -58,7 +58,18 @@ export const useChatStore = defineStore('chat', {
         // detect recommendation intent to use a special prompt and larger candidate set
         const isRecommend = /(추천|추천해주|추천해줘|추천해주세요|추천해)/.test(text)
         const ctxItems = await searchContext(text, isRecommend ? 30 : 5)
-        const contextText = ctxItems.length ? `Context:\n${ctxItems.join('\n')}` : ''
+        const contextText = ctxItems.length ? `${ctxItems.join('\n')}` : ''
+
+        // extract entities and build intent header
+        const entities = extractEntities(text)
+        const intentLines = [
+          '사용자 의도:',
+          `지역 : ${entities.location || '없음'}`,
+          `카테고리 : ${entities.category || '없음'}`,
+          `테마 : ${entities.theme || '없음'}`
+        ].join('\n')
+
+        const combinedContext = [intentLines, contextText ? `Context:\n${contextText}` : ''].filter(Boolean).join('\n\n')
 
         // Debug: show what context items were found and the prompt sent to OpenAI
         try {
@@ -68,21 +79,38 @@ export const useChatStore = defineStore('chat', {
 
         let userPrompt
         if (isRecommend) {
-          // instruct model to choose among provided candidates only
-          userPrompt = `다음 후보 중에서만\n아이들과 가기 좋은 장소 3곳을 추천해라.\n추천 이유는 한 줄로 작성하라.\nContext에 없는 장소는 절대 생성하지 마라.\n가장 적합한 장소부터 추천하라.\n\n${contextText}`
+          // theme-based recommendation prompts
+          const THEME_PROMPTS = {
+            아이: '아이들과 가기 좋은 장소 3곳을 추천해라.',
+            데이트: '데이트하기 좋은 장소 3곳을 추천해라.',
+            러닝: '러닝하기 좋은 장소 3곳을 추천해라.',
+            사진: '사진 찍기 좋은 장소 3곳을 추천해라.',
+            가족: '가족과 가기 좋은 장소 3곳을 추천해라.'
+          }
+
+          const theme = entities && entities.theme ? entities.theme : null
+          if (theme && THEME_PROMPTS[theme]) {
+            userPrompt = `${THEME_PROMPTS[theme]}\n추천 이유는 한 줄로 작성하라.\nContext에 없는 장소는 절대 생성하지 마라.\n가장 적합한 장소부터 추천하라.`
+          } else {
+            // if no theme, fall back to user's original question
+            userPrompt = `질문: ${text}`
+          }
+
+          // Always enforce these recommendation constraints
+          userPrompt += `\n\nContext에 있는 장소만 추천한다.\n추천 이유를 알 수 없으면 '추천 이유'를 쓰지 않는다.\n'관련 정보를 찾지 못했습니다.'를 후보 사이에 넣지 않는다.`
         } else {
-          userPrompt = `${contextText}\n\n질문: ${text}`
+          userPrompt = `질문: ${text}`
         }
 
         try {
           console.debug('messages to OpenAI:', [
             { role: 'system', content: SYSTEM_PROMPT },
-            contextText ? { role: 'system', content: `Context:\n${contextText}` } : null,
+            combinedContext ? { role: 'system', content: combinedContext } : null,
             { role: 'user', content: userPrompt }
           ].filter(Boolean))
         } catch (e) { /* ignore logging errors */ }
 
-        const assistant = await chatWithOpenAI(SYSTEM_PROMPT, userPrompt, { model: 'gpt-5-mini' })
+        const assistant = await chatWithOpenAI(SYSTEM_PROMPT, userPrompt, { model: 'gpt-5-mini', context: combinedContext || undefined })
 
         const assistantMsg = { role: 'assistant', text: assistant || '관련 정보를 찾지 못했습니다.', time: Date.now() }
         this.messages.push(assistantMsg)
