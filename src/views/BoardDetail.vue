@@ -80,7 +80,8 @@ export default {
     imageUrl() {
       if (!this.post) return '/images/default/default1.jpg'
       return this.post.firstimage || this.post.image || this.selectedDefaultImage || '/images/default/default1.jpg'
-    },
+    }
+  },
   methods: {
     formatTimestamp(ts) {
       if (!ts) return ''
