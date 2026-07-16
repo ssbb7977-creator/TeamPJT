@@ -7,9 +7,32 @@ const INVALID_WORDS = [
 
 // Location keywords to detect in user questions
 const LOCATIONS = [
-  '서면', '광안리', '광안', '명지', '기장', '초량', '송정', '감천', '감천문화마을', '다대포', '해운대', '부산'
+  '사상',
+  '서면',
+  '남포',
+  '광복동',
+  '부전동',
+  '전포',
+  '해운대',
+  '송정',
+  '광안리',
+  '광안',
+  '센텀',
+  '명지',
+  '강서',
+  '기장',
+  '송도',
+  '영도',
+  '동래',
+  '온천',
+  '덕천',
+  '화명',
+  '초량',
+  '다대포',
+  '감천',
+  '감천문화마을',
+  '부산'
 ]
-
 // Theme keywords dictionary
 const THEME_KEYWORDS = {
   아이: ['공원', '체험', '과학', '아쿠아', '박물관'],
@@ -43,7 +66,17 @@ const CATEGORY_MAP = {
   관광지: ['관광', '명소', '가볼만'],
   문화시설: ['박물관', '미술관', '전시'],
   축제공연행사: ['축제', '행사'],
-  쇼핑: ['시장', '쇼핑', '아울렛'],
+  쇼핑: [
+    '시장',
+    '쇼핑',
+    '쇼핑몰',
+    '몰',
+    '마트',
+    '백화점',
+    '아울렛',
+    '스토어',
+    '플라자'
+],
   레포츠: ['러닝', '산책', '운동']
 }
 
@@ -79,11 +112,21 @@ async function loadAllData() {
 }
 
 function detectLocation(question) {
-  const q = (question || '').toLowerCase()
-  for (const loc of LOCATIONS) {
-    if (q.includes(loc.toLowerCase())) return loc
-  }
-  return null
+
+    const q = question.toLowerCase()
+
+    for (const loc of LOCATIONS) {
+
+        if (
+            q.includes(loc.toLowerCase()) ||
+            q.includes(loc.toLowerCase() + '구') ||
+            q.includes(loc.toLowerCase() + '역')
+        ) {
+            return loc
+        }
+    }
+
+    return null
 }
 
 function detectCategory(question) {
@@ -258,26 +301,59 @@ async function searchData(entity, limit = 10) {
     const title = (it.title || it.name || '').toLowerCase()
     const addr = (it.addr1 || it.addr || '').toLowerCase()
     const overview = (overviewField(it) || '').toLowerCase()
-    if (loc && addr.includes(loc)) score += 100
-    if (cat && it.__source === cat) score += 30
-    // theme match gives a single boost if any of the theme keywords appear
-    if (themeWords.length > 0) {
-      if (themeWords.some(k => title.includes(k) || addr.includes(k) || overview.includes(k))) score += 20
+    // 지역
+    if (loc) {
+        if (title.includes(loc)) score += 120
+        if (addr.includes(loc)) score += 80
     }
-    // title keyword matches (from user's question) small boost
-    const kw = Array.isArray(entity.keywords) ? entity.keywords.map(k => k.toLowerCase()) : []
-    if (kw.length > 0 && kw.some(k => title.includes(k))) score += 5
+    // 카테고리
+    if (cat && it.__source === cat) {
+          score += 50
+    }
+    // 테마
+    if (themeWords.length > 0) {
+
+        if (themeWords.some(k => title.includes(k)))
+            score += 50
+
+        if (themeWords.some(k => addr.includes(k)))
+            score += 30
+
+        if (themeWords.some(k => overview.includes(k)))
+            score += 20
+    }
+
+      // 질문 키워드
+      const kw = Array.isArray(entity.keywords)
+          ? entity.keywords.map(k => k.toLowerCase())
+          : []
+
+      for (const k of kw) {
+
+          if (title.includes(k))
+              score += 15
+
+          if (addr.includes(k))
+              score += 10
+      }
+
+
     // Only include items with positive score
     if (score > 0) {
       results.push({ type: 'place', title: it.title || it.name || '', addr: it.addr1 || it.addr || '', tel: it.tel || '', score, raw: it })
     }
-    if (results.length >= Math.min(limit, 10)) break
   }
 
   // sort by score desc
-  results.sort((a, b) => (b.score || 0) - (a.score || 0))
-  try { console.debug('5. final', results.map(x => x.title)) } catch(e) {}
-  return results.slice(0, Math.min(limit, 10))
+  results.sort((a,b)=>{
+
+    if(b.score !== a.score)
+        return b.score - a.score
+
+      return a.title.localeCompare(b.title)
+  })
+
+  return results.slice(0, limit)
 }
 
 function formatResults(results, limit = 5) {

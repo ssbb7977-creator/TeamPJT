@@ -9,6 +9,8 @@ const fileMap = {
   // Note: 'food' (맛집) 데이터 file not present in repo and therefore omitted
 }
 
+const _cache = {}
+
 async function fetchFile(path) {
   try {
     const resp = await fetch(path)
@@ -20,8 +22,10 @@ async function fetchFile(path) {
 }
 
 export async function loadPlaces(category = 'all') {
+  // simple in-memory cache per category
+  if (_cache[category]) return _cache[category]
+
   if (category === 'all') {
-    // load all known files and merge items arrays
     const paths = Object.values(fileMap)
     const results = await Promise.all(paths.map(p => fetchFile(p)))
     const merged = []
@@ -34,17 +38,20 @@ export async function loadPlaces(category = 'all') {
         merged.push(...(Array.isArray(items) ? items : (items.item || [])))
       }
     }
+    _cache[category] = merged
     return merged
   }
 
   const path = fileMap[category] || fileMap['tour']
   const r = await fetchFile(path)
-  if (!r) return []
-  if (Array.isArray(r)) return r
-  if (r.items) return r.items
-  if (r.response && r.response.body && r.response.body.items) {
+  if (!r) { _cache[category] = []; return [] }
+  let out = []
+  if (Array.isArray(r)) out = r
+  else if (r.items) out = r.items
+  else if (r.response && r.response.body && r.response.body.items) {
     const items = r.response.body.items
-    return Array.isArray(items) ? items : (items.item || [])
+    out = Array.isArray(items) ? items : (items.item || [])
   }
-  return []
+  _cache[category] = out
+  return out
 }

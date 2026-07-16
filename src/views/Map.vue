@@ -106,7 +106,8 @@ export default {
       markerLayer: null,
       mapCentered: false,
       markers: {},
-      pendingFocusKey: null
+      pendingFocusKey: null,
+      _renderingMarkers: false
     }
   },
   computed: {
@@ -115,8 +116,8 @@ export default {
       return map[this.selectedCategory] || this.selectedCategory
     },
     filteredPlaces() {
-      const arr = Array.isArray(this.places) ? this.places.slice() : []
-      return arr
+      // Return places directly; avoid sorting here to prevent repeated re-sorts
+      return Array.isArray(this.places) ? this.places : []
     }
   },
   // created() removed: location restore handled in mounted to ensure data loads first
@@ -225,32 +226,7 @@ export default {
       } catch (e) {
         console.error('[Map] focusPlace error', e)
       }
-    },
-    zoomIn() {
-      try { if (this.map) this.map.zoomIn() } catch (e) { console.warn('[Map] zoomIn failed', e) }
-    },
-    zoomOut() {
-      try { if (this.map) this.map.zoomOut() } catch (e) { console.warn('[Map] zoomOut failed', e) }
-    },
-    async locateUser() {
-      if (this.userLocation) {
-        try {
-          this.map.flyTo([this.userLocation.lat, this.userLocation.lng], 13)
-        } catch (e) {}
-        return
-      }
-      if (navigator && navigator.geolocation) {
-        navigator.geolocation.getCurrentPosition(async pos => {
-          this.userLocation = { lat: pos.coords.latitude, lng: pos.coords.longitude }
-          try { localStorage.setItem('localhub_location', JSON.stringify({ lat: this.userLocation.lat, lng: this.userLocation.lng, timestamp: Date.now() })) } catch(e){}
-          await this.computeDistances()
-          try { this.map.flyTo([this.userLocation.lat, this.userLocation.lng], 13) } catch(e){}
-        }, err => { console.warn('[Map] locateUser denied', err) })
-      } else {
-        alert('브라우저에서 위치 정보를 사용할 수 없습니다.')
-      }
-    },
-    applyDistanceSort() {
+    },    applyDistanceSort() {
       try {
         this.places.sort((a,b)=>{
           const da = (a.distance == null) ? Infinity : a.distance
@@ -261,6 +237,8 @@ export default {
     },
     renderMarkers() {
       if (!this.map || !this.markerLayer) return
+      if (this._renderingMarkers) return
+      this._renderingMarkers = true
       this.$nextTick(() => { try { this.map.invalidateSize() } catch(e) {} })
       // if showing all for category, show all items; otherwise limit? we'll show all up to a reasonable cap
       const cap = 200
@@ -327,6 +305,7 @@ export default {
         }
         this.pendingFocusKey = null
       }
+      this._renderingMarkers = false
     },
     formatDistanceText(d) {
       if (d == null || !isFinite(d)) return '거리 정보 없음'
@@ -362,7 +341,7 @@ export default {
       const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a))
       return R * c
     },
-    sortByDistance() {
+    async sortByDistance() {
       if (!this.userLocation) {
         // if no location, attempt to get once more
         if (navigator && navigator.geolocation) {

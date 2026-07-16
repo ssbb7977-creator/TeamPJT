@@ -5,9 +5,9 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
-    "preview": "vite preview"
-    ,"copy-busandata": "node scripts/copy_busan_data.js"
-    ,"convert-images": "node scripts/convert-default-images.js"
+    "preview": "vite preview",
+    "copy-busandata": "node scripts/copy_busan_data.js",
+    "convert-images": "node scripts/convert-default-images.js"
   },
   "dependencies": {
     "@tailwindcss/vite": "^4.3.2",
@@ -15,6 +15,7 @@
     "leaflet": "^1.9.3",
     "leaflet.markercluster": "^1.5.3",
     "pinia": "^2.0.0",
+    "sharp": "^0.35.3",
     "vue": "^3.4.0",
     "vue-router": "^4.2.0"
   },
