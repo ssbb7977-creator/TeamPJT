@@ -3,6 +3,7 @@ import { chatWithOpenAI } from '../apis/openai'
 import { searchContext } from '../apis/searchContext'
 
 const MAX_MESSAGES = 10
+const STORAGE_KEY = 'localhub_chat_history_v1'
 
 const SYSTEM_PROMPT = `너는 LocalHub 부산 관광 도우미이다.\n반드시 제공된 관광 JSON과 게시글 데이터만 이용하여 답변한다.\n없는 내용은 추측하지 말고 "관련 정보를 찾지 못했습니다." 라고 답변한다.\n모든 답변은 한국어로 작성한다.\n답변은 최대 5줄로 간결하게 작성한다.`
 
@@ -13,11 +14,22 @@ export const useChatStore = defineStore('chat', {
     error: null
   }),
   actions: {
-    // Persistence disabled: do not retain chat history across page refresh
-    initFromStorage() {},
-    saveToStorage() {},
+    initFromStorage() {
+      try {
+        const raw = localStorage.getItem(STORAGE_KEY)
+        if (!raw) return
+        const arr = JSON.parse(raw)
+        if (Array.isArray(arr)) this.messages = arr
+      } catch (e) { console.error('initFromStorage', e) }
+    },
+    saveToStorage() {
+      try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(this.messages))
+      } catch (e) { console.error('saveToStorage', e) }
+    },
     clearHistory() {
       this.messages = []
+      this.saveToStorage()
     },
     async sendMessage(text) {
       if (!text || this.loading) return
@@ -26,6 +38,7 @@ export const useChatStore = defineStore('chat', {
       this.messages.push(userMsg)
       // cap
       while (this.messages.length > MAX_MESSAGES) this.messages.shift()
+      this.saveToStorage()
 
       // quick reject: month+period queries (e.g., "7월에 열리는 축제 알려줘")
       const monthQuestion = /(1|2|3|4|5|6|7|8|9|10|11|12)\s*월/.test(text)
@@ -74,6 +87,7 @@ export const useChatStore = defineStore('chat', {
         const assistantMsg = { role: 'assistant', text: assistant || '관련 정보를 찾지 못했습니다.', time: Date.now() }
         this.messages.push(assistantMsg)
         while (this.messages.length > MAX_MESSAGES) this.messages.shift()
+        this.saveToStorage()
       } catch (e) {
         console.error('sendMessage error', e)
         // surface actual error message to assist debugging; user-facing UI can show generic text later
