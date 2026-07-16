@@ -27,6 +27,18 @@ export const useChatStore = defineStore('chat', {
       // cap
       while (this.messages.length > MAX_MESSAGES) this.messages.shift()
 
+      // quick reject: month+period queries (e.g., "7월에 열리는 축제 알려줘")
+      const monthQuestion = /(1|2|3|4|5|6|7|8|9|10|11|12)\s*월/.test(text)
+      const periodQuestion = /(오늘|내일|이번주|다음주|주말|언제|기간|운영기간|열리는)/.test(text)
+      if (monthQuestion && periodQuestion) {
+        const reply = '제공된 관광 데이터에는 축제 운영기간 정보가 없어 월별 축제은 안내할 수 없습니다.\n축제 이름이나 장소를 질문해 주세요.'
+        const assistantMsg = { role: 'assistant', text: reply, time: Date.now() }
+        this.messages.push(assistantMsg)
+        while (this.messages.length > MAX_MESSAGES) this.messages.shift()
+        this.saveToStorage()
+        return
+      }
+
       this.loading = true
       try {
         // Search local context from Busan JSON and posts
