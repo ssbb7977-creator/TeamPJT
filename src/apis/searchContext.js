@@ -59,6 +59,28 @@ export async function searchContext(query, limit = 5) {
   const monthMatch = (query || '').toString().match(/(\d{1,2})\s*월/)
   const monthFilter = monthMatch ? Number(monthMatch[1]) : null
 
+  // detect family/children intent (return curated family-friendly places)
+  const isFamily = /(아이|어린이|유아|가족|키즈|아동)/.test((query||''))
+  if (isFamily) {
+    const familyKeywords = ['공원','과학','아쿠아','체험','박물관','놀이','키즈','수족관','어린이']
+    const candidates = []
+    for (const f of DATA_FILES) {
+      const items = await loadJsonFile(f)
+      for (const it of items) {
+        const title = it.title || it.name || ''
+        const addr = it.addr1 || it.address || ''
+        const hay = normalize(title + ' ' + addr + ' ' + (it.overview || it.intro || ''))
+        if (familyKeywords.some(k => hay.includes(k))) {
+          candidates.push({ type: 'place', title, addr, tel: it.tel || '', snippet: (it.overview || '').slice(0,120), meta: f.replace('.json','') })
+          if (candidates.length >= 10) break
+        }
+      }
+      if (candidates.length >= 10) break
+    }
+    if (candidates.length > 0) return formatResults(candidates.slice(0,10))
+    // fallthrough if none found
+  }
+
   // detect simple tourism recommendation queries (e.g., '해운대 관광지 추천해줘')
   const isTourRecommend = /(관광지|관광|추천)/.test((query||''))
   // choose a location token that's not a generic word
