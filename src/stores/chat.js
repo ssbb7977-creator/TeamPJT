@@ -42,7 +42,9 @@ export const useChatStore = defineStore('chat', {
       this.loading = true
       try {
         // Search local context from Busan JSON and posts
-        const ctxItems = await searchContext(text, 5)
+        // detect recommendation intent to use a special prompt and larger candidate set
+        const isRecommend = /(추천|추천해주|추천해줘|추천해주세요|추천해)/.test(text)
+        const ctxItems = await searchContext(text, isRecommend ? 30 : 5)
         const contextText = ctxItems.length ? `Context:\n${ctxItems.join('\n')}` : ''
 
         // Debug: show what context items were found and the prompt sent to OpenAI
@@ -51,7 +53,13 @@ export const useChatStore = defineStore('chat', {
           console.debug('context preview:', contextText ? contextText.slice(0, 200) : '(none)')
         } catch (e) { /* ignore logging errors */ }
 
-        const userPrompt = `${contextText}\n\n질문: ${text}`
+        let userPrompt
+        if (isRecommend) {
+          // instruct model to choose among provided candidates only
+          userPrompt = `다음 후보 중에서만\n아이들과 가기 좋은 장소 3곳을 추천해라.\n추천 이유는 한 줄로 작성하라.\nContext에 없는 장소는 절대 생성하지 마라.\n가장 적합한 장소부터 추천하라.\n\n${contextText}`
+        } else {
+          userPrompt = `${contextText}\n\n질문: ${text}`
+        }
 
         try {
           console.debug('messages to OpenAI:', [
