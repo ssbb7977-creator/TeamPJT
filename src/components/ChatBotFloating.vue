@@ -11,6 +11,13 @@
           <button class="close" @click="close" aria-label="닫기">✕</button>
         </header>
 
+        <div class="suggestions" v-if="suggestedQuestions && suggestedQuestions.length">
+          <div class="suggest-label">권장 질문</div>
+          <div class="suggest-list">
+            <button v-for="s in suggestedQuestions" :key="s" class="suggest-btn" @click="sendSuggestion(s)">{{ s }}</button>
+          </div>
+        </div>
+
         <div class="messages" ref="msgList">
           <div v-for="m in messages" :key="m.id" :class="['msg', m.role]">
             <div class="text">{{ m.text }}</div>
@@ -33,7 +40,13 @@ import { useChatStore } from '../stores/chat'
 
 export default {
   data() {
-    return { open: false, input: '', iconUrl: 'https://img.magnific.com/free-vector/chatbot-chat-message-vectorart_78370-4104.jpg?semt=ais_hybrid&w=740&q=80' }
+    return { open: false, input: '', iconUrl: 'https://img.magnific.com/free-vector/chatbot-chat-message-vectorart_78370-4104.jpg?semt=ais_hybrid&w=740&q=80',
+      suggestedQuestions: [
+        '안녕',
+        '부산항축제가 어디에서 열려?',
+        '7월에 열리는 축제 알려줘'
+      ]
+    }
   },
   setup() {
     const store = useChatStore()
@@ -60,6 +73,15 @@ export default {
       await this.store.sendMessage(text)
       this.$nextTick(()=> this.scrollBottom())
     },
+    async sendSuggestion(s) {
+      if (this.store.loading) return
+      try {
+        await this.store.sendMessage(s)
+        this.$nextTick(()=> this.scrollBottom())
+      } catch (e) {
+        console.error('sendSuggestion error', e)
+      }
+    },
     clearHistory() { this.store.clearHistory(); this.$nextTick(()=> this.scrollBottom()) }
   }
 }
@@ -80,6 +102,10 @@ export default {
 .composer { display:flex; gap:8px; padding:10px; border-top:1px solid #eee }
 .composer input { flex:1; padding:8px 10px; border:1px solid #ddd; border-radius:8px }
 .composer .send { background:#00478d; color:#fff; border:0; padding:8px 12px; border-radius:8px }
+.suggestions { padding:8px 12px; border-bottom:1px solid #eee; background:#fbfdff }
+.suggest-label { font-size:12px; color:#64748b; margin-bottom:6px }
+.suggest-list { display:flex; gap:8px; flex-wrap:wrap }
+.suggest-btn { background:#eef5ff; border:0; padding:6px 8px; border-radius:8px; cursor:pointer; color:#0b5fb8 }
 
 @media (max-width:640px) {
   .chatbox { width:100vw; height:50vh; right:0; left:0; bottom:0; border-radius:12px 12px 0 0 }

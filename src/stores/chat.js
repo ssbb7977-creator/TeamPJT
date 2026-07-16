@@ -33,7 +33,21 @@ export const useChatStore = defineStore('chat', {
         const ctxItems = await searchContext(text, 5)
         const contextText = ctxItems.length ? `Context:\n${ctxItems.join('\n')}` : ''
 
+        // Debug: show what context items were found and the prompt sent to OpenAI
+        try {
+          console.debug('searchContext results:', ctxItems)
+          console.debug('context preview:', contextText ? contextText.slice(0, 200) : '(none)')
+        } catch (e) { /* ignore logging errors */ }
+
         const userPrompt = `${contextText}\n\n질문: ${text}`
+
+        try {
+          console.debug('messages to OpenAI:', [
+            { role: 'system', content: SYSTEM_PROMPT },
+            contextText ? { role: 'system', content: `Context:\n${contextText}` } : null,
+            { role: 'user', content: userPrompt }
+          ].filter(Boolean))
+        } catch (e) { /* ignore logging errors */ }
 
         const assistant = await chatWithOpenAI(SYSTEM_PROMPT, userPrompt, { model: 'gpt-5-mini' })
 
