@@ -1,10 +1,15 @@
 const STORAGE_KEY = 'localhub_posts_v1'
 
-function loadPosts() {
+function loadPosts(limit = null) {
   try {
     const raw = localStorage.getItem(STORAGE_KEY)
     if (!raw) return []
-    return JSON.parse(raw)
+    const arr = JSON.parse(raw)
+    if (!Array.isArray(arr)) return []
+    // sort by createdAt desc
+    arr.sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0))
+    if (limit && Number.isInteger(limit)) return arr.slice(0, limit)
+    return arr
   } catch (e) {
     console.error('Failed to load posts', e)
     return []

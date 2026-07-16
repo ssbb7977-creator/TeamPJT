@@ -6,7 +6,9 @@
     </div>
     <div class="places-grid">
       <article v-for="p in places.slice(0,8)" :key="p.contentid || p.title" class="place-card-grid">
-        <div class="pc-img" v-if="p.firstimage" :style="`background-image:url(${p.firstimage})`"></div>
+        <div class="pc-img">
+          <img :src="p.firstimage || '/images/default/default1.jpg'" loading="lazy" decoding="async" alt="" />
+        </div>
         <div class="pc-body">
           <div class="pc-category">{{ p.contentType || p.contenttype || '' }}</div>
           <h4 class="pc-title">{{ p.title || p.name }}</h4>
@@ -40,7 +42,8 @@ export default {
 .places-grid { display:grid; grid-template-columns: repeat(4, 1fr); gap:16px }
 .place-card-grid { border-radius:12px; overflow:hidden; background:#fff; box-shadow: 0 8px 20px rgba(2,6,23,0.06); transition:transform .25s ease, box-shadow .25s ease }
 .place-card-grid:hover { transform:translateY(-6px); box-shadow: 0 20px 40px rgba(2,6,23,0.12) }
-.pc-img { height:160px; background-size:cover; background-position:center }
+.pc-img { height:160px; overflow:hidden }
+.pc-img img { width:100%; height:160px; object-fit:cover; display:block }
 .pc-body { padding:12px }
 .pc-category { color:#0b5fb8; font-weight:700; font-size:12px; margin-bottom:6px }
 .pc-title { font-size:16px; font-weight:800; margin-bottom:8px }

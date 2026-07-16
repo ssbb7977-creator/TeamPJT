@@ -43,12 +43,9 @@ export default {
   name: 'RecentPosts',
   data() { return { posts: [] } },
   computed: {
-    latest() {
-      const arr = Array.isArray(this.posts) ? this.posts.slice().sort((a,b)=> (b.createdAt||0) - (a.createdAt||0)) : []
-      return arr.slice(0,3)
-    }
+    latest() { return this.posts }
   },
-  mounted() { this.posts = loadPosts() },
+  mounted() { this.posts = loadPosts(3) },
   methods: {
     timeAgo(ts) {
       if (!ts) return ''

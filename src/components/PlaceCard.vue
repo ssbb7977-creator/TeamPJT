@@ -1,6 +1,6 @@
 <template>
   <article class="place-card">
-    <img v-if="place.firstimage" :src="place.firstimage" class="thumb" alt="" />
+    <img :src="place.firstimage || '/images/default/default1.jpg'" loading="lazy" decoding="async" class="thumb" alt="" />
     <div class="content">
       <h4 class="title">{{ place.title || place.name }}</h4>
       <div class="category">{{ place.contentType || place.contenttype || '' }}</div>
